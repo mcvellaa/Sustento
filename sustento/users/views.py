@@ -6,7 +6,7 @@ from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import User
+from .models import *
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -31,10 +31,13 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 def UserSendView(request):
     from .forms import UserSendForm
+    context = {}
+    context['responses'] = Response.objects.all()
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = UserSendForm(request.POST)
+        context['form'] = form
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -50,8 +53,9 @@ def UserSendView(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UserSendForm()
+        context['form'] = form
 
-    return render(request, 'users/send.html', {'form': form})
+    return render(request, 'users/send.html', context)
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 

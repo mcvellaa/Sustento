@@ -12,5 +12,27 @@
       </div>
     </div>
   </form>
+  <br>
+
+  <h1>Responses</h1>
+  <br>
+  <table>
+    {% if responses %}
+        <tr>
+            <th>Phone Number</th>
+            <th>Date and Time</th>
+            <th>Anonymous?</th>
+            <th>Message</th>
+        </tr>
+        {% for r in responses %}
+        <tr>
+            <td > {{ r.phone }} </td>
+            <td > {{ r.date_created }} </td>
+            <td > {{ r.anonymous }} </td>
+            <td > {{ r.message }} </td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+  </table>
 
 {% endblock %}
