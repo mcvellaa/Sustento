@@ -11,6 +11,8 @@ from .models import User
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
+from twilio.rest import TwilioRestClient
+import os
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -37,7 +39,9 @@ def UserSendView(request):
             # process the data in form.cleaned_data as required
             # 
             # THIS IS WHERE I SEND TO TWILIO
-            print(request.POST.get('text'))
+            tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+            message = tclient.messages.create(body=request.POST.get('text'), to="+12035601401", from_="+14122010448")
+            # 
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~send/')
 
