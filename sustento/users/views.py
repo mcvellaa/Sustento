@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 
 from twilio.rest import TwilioRestClient
 import os
+import re
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -40,7 +41,8 @@ def UserSendView(request):
             # 
             # THIS IS WHERE I SEND TO TWILIO
             tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
-            message = tclient.messages.create(body=request.POST.get('text'), to="+12035601401", from_="+14122010448")
+            phone_number = re.sub("(,[ ]*!.*-)$", "", request.POST.get('phone'))
+            message = tclient.messages.create(body=request.POST.get('text'), to="+1"+phone_number, from_="+14122010448")
             # 
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~send/')

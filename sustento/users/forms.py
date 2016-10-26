@@ -6,3 +6,4 @@ class UserSendForm(forms.Form):
 #        self.helper = FormHelper(self)
 
     text = forms.CharField(label='Text', max_length=100)
+    phone = forms.CharField(label='Phone', max_length=10)
