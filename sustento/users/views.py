@@ -8,6 +8,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import User
 
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -23,6 +26,26 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
         return reverse('users:detail',
                        kwargs={'username': self.request.user.username})
 
+def UserSendView(request):
+    from .forms import UserSendForm
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = UserSendForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # 
+            # THIS IS WHERE I SEND TO TWILIO
+            print(request.POST.get('text'))
+            # redirect to a new URL:
+            return HttpResponseRedirect('/users/~send/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = UserSendForm()
+
+    return render(request, 'users/send.html', {'form': form})
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 

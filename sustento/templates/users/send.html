@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<h1>Send Text Message</h1>
+  <form class="form-horizontal" method="post" action="{% url 'users:send' %}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn">Send</button>
+      </div>
+    </div>
+  </form>
+
+{% endblock %}
