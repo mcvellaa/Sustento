@@ -31,4 +31,9 @@ urlpatterns = [
         view=views.UserSendView,
         name='send'
     ),
+    url(
+        regex=r'^~receive/$',
+        view=views.UserReceive,
+        name='receive'
+    ),
 ]
