@@ -89,7 +89,7 @@ def UserReceive(request):
     if request.method == 'POST':
         #receive the Twilio post data and create a new response object
         respPhone = "phone" #request.POST.get('From')
-        respMessage = "message" #request.POST.get('Body')
+        respMessage = request.POST.get('Body')
         #try request.META["HTTP_HOST"]
         resp = Response(phone=respPhone, anonymous=False, message=respMessage)
         resp.save()
