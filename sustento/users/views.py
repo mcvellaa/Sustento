@@ -10,6 +10,7 @@ from .models import *
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt
 
 from twilio.rest import TwilioRestClient
 import os
@@ -57,20 +58,6 @@ def UserSendView(request):
 
     return render(request, 'users/send.html', context)
 
-def UserReceive(request):
-    # if this is a POST request from Twilio, we need to process the POST data
-    if request.method == 'POST':
-        #receive the Twilio post data and create a new response object
-        #respPhone = request.POST.get
-        #respMessage = request.POST.get
-        #coming next: request.META["HTTP_HOST"]
-        resp = Response(phone="TEST", anonymous=False, message=request.body)
-        resp.save()
-        return HttpResponseRedirect('/users/~send/')
-    # if a GET or wrong domain, we'll just redirect
-    else:
-        return HttpResponseRedirect('/users/~send/')
-
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     fields = ['name', ]
@@ -93,3 +80,20 @@ class UserListView(LoginRequiredMixin, ListView):
     # These next two lines tell the view to index lookups by username
     slug_field = 'username'
     slug_url_kwarg = 'username'
+    
+
+#this will come from Twilio, so we won't have the secret token
+@csrf_exempt
+def UserReceive(request):
+    # if this is a POST request from Twilio, we need to process the POST data
+    if request.method == 'POST':
+        #receive the Twilio post data and create a new response object
+        #respPhone = request.POST.get
+        #respMessage = request.POST.get
+        #coming next: request.META["HTTP_HOST"]
+        resp = Response(phone="TEST", anonymous=False, message=request.body)
+        resp.save()
+        return HttpResponseRedirect('/users/~send/')
+    # if a GET or wrong domain, we'll just redirect
+    else:
+        return HttpResponseRedirect('/users/~send/')
