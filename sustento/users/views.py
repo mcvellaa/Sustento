@@ -90,7 +90,8 @@ def UserReceive(request):
         #receive the Twilio post data and create a new response object
         respPhone = request.POST.get('From')
         respMessage = request.POST.get('Body')
-        resp = Response(phone=respPhone, anonymous=False, message=request.META["HTTP_HOST"])
+        #try request.META["HTTP_HOST"]
+        resp = Response(phone=respPhone, anonymous=False, message=respMessage)
         resp.save()
         return HttpResponseRedirect('/users/~send/')
     # if a GET or wrong domain, we'll just redirect
