@@ -22,7 +22,7 @@ class User(AbstractUser):
         return reverse('users:detail', kwargs={'username': self.username})
 
 class Response(models.Model):
-    phone = models.CharField(max_length=10)
+    phone = models.CharField(max_length=15)
     anonymous = models.BooleanField()
     message = models.CharField(max_length=1000)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
