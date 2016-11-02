@@ -88,7 +88,7 @@ def UserReceive(request):
     # if this is a POST request from Twilio, we need to process the POST data
     if request.method == 'POST':
         #receive the Twilio post data and create a new response object
-        respPhone = str(request.POST.get('From'))[-10:]
+        respPhone = str(request.POST.get('From'))[-9:]
         respMessage = request.POST.get('Body')
         resp = Response(phone=respPhone, anonymous=False, message=request.META)
         resp.save()
