@@ -116,7 +116,7 @@ def UserReceive(request):
         respPhone = request.POST.get('From')[-10:]
         respMessage = request.POST.get('Body')
         # query the users table to get the user id of the phone number, or just put 1
-        userid = User.objects.get(phone=respPhone).id
+        userid = User.objects.get(phone=respPhone)
         # now save the response to be shown
         resp = Response(sender=userid, phone=respPhone, message=respMessage)
         resp.save()
