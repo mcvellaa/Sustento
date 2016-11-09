@@ -26,10 +26,10 @@
         </tr>
         {% for s in sentMessages %}
         <tr>
-            <td > {{ r.recipient.name }} </td>
-            <td > {{ r.phone }} </td>
-            <td > {{ r.date_created }} </td>
-            <td > {{ r.message }} </td>
+            <td > {{ s.recipient.name }} </td>
+            <td > {{ s.phone }} </td>
+            <td > {{ s.date_created }} </td>
+            <td > {{ s.message }} </td>
         </tr>
         {% endfor %}
     {% endif %}
