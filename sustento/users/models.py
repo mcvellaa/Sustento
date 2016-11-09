@@ -14,7 +14,7 @@ class User(AbstractUser):
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_('Name of User'), blank=True, max_length=255)
-    phone = models.CharField(_('Phone Number'), blank=False, max_length=255)
+    phone = models.CharField(_('Phone Number'), blank=False, max_length=255, unique=True)
 
     def __str__(self):
         return self.username
@@ -23,7 +23,13 @@ class User(AbstractUser):
         return reverse('users:detail', kwargs={'username': self.username})
 
 class Response(models.Model):
+    sender = models.ForeignKey(User)
     phone = models.CharField(max_length=15)
-    anonymous = models.BooleanField()
+    message = models.CharField(max_length=1000)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+
+class SentMessage(models.Model):
+    recipient = models.ForeignKey(User)
+    phone = models.CharField(max_length=15)
     message = models.CharField(max_length=1000)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)

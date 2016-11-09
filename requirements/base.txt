@@ -6,6 +6,7 @@ wheel==0.29.0
 
 twilio==5.6.0
 whitenoise
+watson_developer_cloud
 
 # Bleeding edge Django
 django==1.10.2

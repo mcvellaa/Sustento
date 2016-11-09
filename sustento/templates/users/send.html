@@ -14,17 +14,40 @@
   </form>
   <br>
 
-  <h1>Responses</h1>
+  <h1>Sent Messages (manually or automated)</h1>
+  <br>
+  <table class="table-striped">
+    {% if sentMessages %}
+        <tr>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Date and Time</th>
+            <th>Message</th>
+        </tr>
+        {% for s in sentMessages %}
+        <tr>
+            <td > {{ r.recipient.name }} </td>
+            <td > {{ r.phone }} </td>
+            <td > {{ r.date_created }} </td>
+            <td > {{ r.message }} </td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+  </table>
+
+  <h1>Response (Received Messages)</h1>
   <br>
   <table class="table-striped">
     {% if responses %}
         <tr>
+            <th>Name</th>
             <th>Phone Number</th>
             <th>Date and Time</th>
             <th>Message</th>
         </tr>
         {% for r in responses %}
         <tr>
+            <td > {{ r.sender.name }} </td>
             <td > {{ r.phone }} </td>
             <td > {{ r.date_created }} </td>
             <td > {{ r.message }} </td>
