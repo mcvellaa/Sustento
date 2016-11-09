@@ -67,7 +67,7 @@ def UserSendView(request):
             # THIS IS WHERE I SEND TO TWILIO
             tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
             phone_number = re.sub("(,[ ]*!.*-)$", "", request.POST.get('phone'))
-            userid = User.objects.get(phone=phone_number).id
+            userid = User.objects.get(phone=phone_number)
             messageBody = request.POST.get('text')
             sentM = SentMessage(recipient=userid, phone=phone_number, message=messageBody)
             sentM.save()
