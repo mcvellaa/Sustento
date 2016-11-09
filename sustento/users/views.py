@@ -60,7 +60,7 @@ def UserSendView(request):
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
-    fields = ['name', ]
+    fields = ['name', 'phone', ]
 
     # we already imported User in the view code above, remember?
     model = User
