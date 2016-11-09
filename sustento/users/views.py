@@ -56,7 +56,7 @@ def UserSendView(request):
     from .forms import UserSendForm
     context = {}
     context['responses'] = Response.objects.all()
-    context['sentMessage'] = SentMessage.objects.all()
+    context['sentMessages'] = SentMessage.objects.all()
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
