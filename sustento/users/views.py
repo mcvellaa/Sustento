@@ -105,6 +105,41 @@ class UserListView(LoginRequiredMixin, ListView):
     slug_field = 'username'
     slug_url_kwarg = 'username'
 
+def getResponseForMessage(msg, user):
+    # conversation starter: Hi
+    response1 = conversation.message(
+      workspace_id=workspace_id,
+      message_input={'text': 'Hi'},
+      context={}
+    )
+    # get intent from message sent by user
+    response2 = conversation.message(
+      workspace_id=workspace_id,
+      message_input={'text': msg},
+      context=response1['context']
+    )
+
+    #Store Msg + Sentiment Analysis if appropriate
+    storeUserMessage(response2, user)
+
+    # Send response to User
+    automatedResp = response2['output']['text']
+    return automatedResp
+
+def storeUserMessage(resp, user):
+    # 2. Perform analysis if personal journal
+    # 3. Store sentiment analysis results
+    # If intent = personal journal --> Sentiment Analysis
+    if 'PersonalJournal' in resp['intents'][0]['intent']:
+        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
+        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+        journalEntry.save()
+    elif 'ContextForWeek' in resp['intents'][0]['intent']:
+        con = ContextForWeek(patient=user, context=resp['entities'][0]['value'], start_date=datetime.today(), end_date=(datetime.today() + datetime.timedelta(days=7)))
+        con.save()
+    else:
+        return
+
 #this will come from Twilio, so we won't have the secret token
 @csrf_exempt
 def UserReceive(request):
@@ -127,44 +162,7 @@ def UserReceive(request):
         tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
         message = tclient.messages.create(body=respToUser, to="+1"+respPhone, from_="+14122010448")
 
-        return HttpResponseRedirect('/users/~send/')
+        return render('users/twilioresponse.xml')
     # if a GET or wrong domain, we'll just redirect
     else:
         return HttpResponseRedirect('/users/~send/')
-
-@csrf_exempt
-def getResponseForMessage(msg, user):
-    # conversation starter: Hi
-    response1 = conversation.message(
-      workspace_id=workspace_id,
-      message_input={'text': 'Hi'},
-      context={}
-    )
-    # get intent from message sent by user
-    response2 = conversation.message(
-      workspace_id=workspace_id,
-      message_input={'text': msg},
-      context=response1['context']
-    )
-
-    #Store Msg + Sentiment Analysis if appropriate
-    storeUserMessage(response2, user)
-
-    # Send response to User
-    automatedResp = response2['output']['text']
-    return automatedResp
-
-@csrf_exempt
-def storeUserMessage(resp, user):
-    # 2. Perform analysis if personal journal
-    # 3. Store sentiment analysis results
-    # If intent = personal journal --> Sentiment Analysis
-    if 'PersonalJournal' in resp['intents'][0]['intent']:
-        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-        journalEntry.save()
-    elif 'ContextForWeek' in resp['intents'][0]['intent']:
-        con = ContextForWeek(patient=user, context=resp['entities'][0]['value'], start_date=datetime.today(), end_date=(datetime.today() + datetime.timedelta(days=7)))
-        con.save()
-    else:
-        return
