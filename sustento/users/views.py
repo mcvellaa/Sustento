@@ -127,7 +127,6 @@ def UserReceive(request):
         tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
         message = tclient.messages.create(body=respToUser, to="+1"+respPhone, from_="+14122010448")
 
-        #return render('users/twilioresponse.xml')
         return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
     # if a GET or wrong domain, we'll just redirect
     else:
