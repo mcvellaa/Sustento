@@ -33,3 +33,19 @@ class SentMessage(models.Model):
     phone = models.CharField(max_length=15)
     message = models.CharField(max_length=1000)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
+
+class ContextForWeek(models.Model):
+    patient = models.ForeignKey(User)
+    context = models.CharField(max_length=1000)
+    start_date = models.DateTimeField(blank=False)
+    end_date = models.DateTimeField(blank=True)
+
+class PersonalJournal(models.Model):
+    patient = models.ForeignKey(User)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    entry = models.CharField(max_length=2000)
+    emotion_anger = models.CharField(max_length=15)
+    emotion_disgust = models.CharField(max_length=15)
+    emotion_sadness = models.CharField(max_length=15)
+    emotion_fear = models.CharField(max_length=15)
+    emotion_joy = models.CharField(max_length=15)

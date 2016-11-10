@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from twilio.rest import TwilioRestClient
 import os
 import re
-
+import datetime
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -34,9 +34,6 @@ conversation = ConversationV1(
 # Workspace (i.e. Sustento) ID
 workspace_id = os.environ['Bluemix_Workspace_id']
 #------------------------------------------------------
-
-# TO BE FIXED: Global variable right now since it needs to be accessible across methods. Need to redesign such that this is not required
-automatedResp = ''
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -57,6 +54,8 @@ def UserSendView(request):
     context = {}
     context['responses'] = Response.objects.all()
     context['sentMessages'] = SentMessage.objects.all()
+    context['journal'] = PersonalJournal.objects.all()
+    context['contexts'] = ContextForWeek.objects.all()
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -106,6 +105,40 @@ class UserListView(LoginRequiredMixin, ListView):
     slug_field = 'username'
     slug_url_kwarg = 'username'
     
+def getResponseForMessage(msg, user):
+    # conversation starter: Hi
+    response1 = conversation.message(
+      workspace_id=workspace_id,
+      message_input={'text': 'Hi'},
+      context={}
+    )
+    # get intent from message sent by user
+    response2 = conversation.message(
+      workspace_id=workspace_id,
+      message_input={'text': msg},
+      context=response1['context']
+    )
+
+    #Store Msg + Sentiment Analysis if appropriate
+    storeUserMessage(response2, user)
+
+    # Send response to User
+    automatedResp = response2['output']['text']
+    return automatedResp
+
+def storeUserMessage(resp, user):
+    # 2. Perform analysis if personal journal
+    # 3. Store sentiment analysis results
+    # If intent = personal journal --> Sentiment Analysis
+    if 'PersonalJournal' in resp['intents'][0]['intent']:
+        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
+        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+        journalEntry.save()
+    elif 'ContextForWeek' in resp['intents'][0]['intent']:
+        con = ContextForWeek(patient=user, context=resp['entities'][0]['value'], start_date=datetime.today(), end_date=(datetime.today() + datetime.timedelta(days=7)))
+        con.save()
+    else:
+        return
 
 #this will come from Twilio, so we won't have the secret token
 @csrf_exempt
@@ -120,6 +153,15 @@ def UserReceive(request):
         # now save the response to be shown
         resp = Response(sender=userid, phone=respPhone, message=respMessage)
         resp.save()
+        #now get automated response
+        respToUser = getResponseForMessage(respMessage, userid)
+        # save the sent message in the database
+        sentM = SentMessage(recipient=userid, phone=respPhone, message=respToUser)
+        sentM.save()
+        # send the text to the user through Twilio
+        tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+        message = tclient.messages.create(body=respToUser, to="+1"+respPhone, from_="+14122010448")
+
         return HttpResponseRedirect('/users/~send/')
     # if a GET or wrong domain, we'll just redirect
     else:
