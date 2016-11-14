@@ -146,6 +146,7 @@ def getResponseForMessage(msg, user):
       message_input={'text': msg},
       context=response1['context']
     )
+    print(response2)
 
     #Store Msg + Sentiment Analysis if appropriate
     storeUserMessage(response2, user)
@@ -188,6 +189,7 @@ def storeUserMessage(resp, user):
         sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
         journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
         journalEntry.save()
+        return
     # If Context For Week: Store Context For Week
     elif msgIntent == 'ContextForWeek':
         entities = resp['entities']
@@ -199,5 +201,6 @@ def storeUserMessage(resp, user):
         # Store Context for Week
         con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
+        return 
     else:
         return
