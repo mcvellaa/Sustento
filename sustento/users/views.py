@@ -152,7 +152,10 @@ def getResponseForMessage(msg, user):
     storeUserMessage(response2, user)
 
     # Send response to User
-    automatedResp = response2['output']['text']
+    if response2['output']['text']:
+        automatedResp = response2['output']['text']
+    else:
+        automatedResp = "Got it, have a great rest of your day!"
     return automatedResp
 
 @csrf_exempt
