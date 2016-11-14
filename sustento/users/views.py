@@ -121,7 +121,7 @@ def UserReceive(request):
         #now get automated response
         respToUser = getResponseForMessage(respMessage, userid)
         # save the sent message in the database
-        sentM = SentMessage(recipient=userid, phone=respPhone, message=respToUser[0])
+        sentM = SentMessage(recipient=userid, phone=respPhone, message=respToUser)
         sentM.save()
         # send the text to the user through Twilio
         tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
@@ -152,7 +152,7 @@ def getResponseForMessage(msg, user):
 
     # Send response to User
     if response2['output']['text']:
-        automatedResp = response2['output']['text']
+        automatedResp = response2['output']['text'][0]
     else:
         automatedResp = 'Got it, have a great rest of your day!'
     return automatedResp
