@@ -155,16 +155,49 @@ def getResponseForMessage(msg, user):
     return automatedResp
 
 @csrf_exempt
+def getContextForWeek(entities):
+    # Entities is a list of dictionaries of different entities identified by Watson Conversation. We want value of entity titled ContextForWeek.
+    if len(entities) < 1:
+        return ''
+    else:
+        for d in entities:
+            if d['entity'] == 'ContextForWeek':
+                return d['value']
+        return ''
+
+@csrf_exempt
+def getIntentOfMsg(intents):
+    # Intents is a list of dictionaries of different intents identified by Watson Conversation. We want to see if intent = PersonalJournal, ContextForWeek or others
+    if len(intents) < 1:
+        return ''
+    else:
+        for d in intents:
+            if d['intent'] == 'ContextForWeek':
+                return 'ContextForWeek'
+            elif d['intent'] == 'PersonalJournal':
+                return 'PersonalJournal'
+        return ''
+
+@csrf_exempt
 def storeUserMessage(resp, user):
-    # 2. Perform analysis if personal journal
-    # 3. Store sentiment analysis results
-    # If intent = personal journal --> Sentiment Analysis
-    if 'PersonalJournal' in resp['intents'][0]['intent']:
+    msgIntent = getIntentOfMsg(resp['intents'])
+    # If Personal Journal:
+        # 1. Perform analysis
+        # 2. Store sentiment analysis results
+    if msgIntent == 'PersonalJournal':
         sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
         journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
         journalEntry.save()
-    elif 'ContextForWeek' in resp['intents'][0]['intent']:
-        con = ContextForWeek(patient=user, context=resp['entities'][0]['value'], start_date=datetime.today(), end_date=(datetime.today() + datetime.timedelta(days=7)))
+    # If Context For Week: Store Context For Week
+    elif msgIntent == 'ContextForWeek':
+        entities = resp['entities']
+        # Get value of entity=contextForWeek if exists
+        conForWeek = getContextForWeek(entities)
+        # Else context = entire message
+        if conForWeek == '':
+            conForWeek = resp['input']['text']
+        # Store Context for Week
+        con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
     else:
         return
