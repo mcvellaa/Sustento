@@ -146,7 +146,6 @@ def getResponseForMessage(msg, user):
       message_input={'text': msg},
       context=response1['context']
     )
-    print(response2)
 
     #Store Msg + Sentiment Analysis if appropriate
     storeUserMessage(response2, user)
@@ -155,7 +154,7 @@ def getResponseForMessage(msg, user):
     if response2['output']['text']:
         automatedResp = response2['output']['text']
     else:
-        automatedResp = "Got it, have a great rest of your day!"
+        automatedResp = 'Got it, have a great rest of your day!'
     return automatedResp
 
 @csrf_exempt
