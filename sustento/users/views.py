@@ -77,7 +77,7 @@ def HomeView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     elif request.user.is_authenticated() and request.user.phone == "":
-        return HttpResponseRedirect('users/update')
+        return HttpResponseRedirect('/users/update')
     from .forms import UserSendForm
     context = {}
     # if this is a POST request we need to process the form data
