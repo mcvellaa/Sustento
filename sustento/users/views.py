@@ -59,8 +59,8 @@ def MessagesView(request):
         return HttpResponseRedirect('/accounts/login/')
     #this is for viewing the raw messages thread
     context = {}
-    context['responses'] = Response.objects.get(sender=request.user)
-    context['sentMessages'] = SentMessage.objects.get(recipient=request.user)
+    context['responses'] = Response.objects.all().filter(sender=request.user)
+    context['sentMessages'] = SentMessage.objects.all().filter(recipient=request.user)
 
     return render(request, 'users/messages.html', context)
 
@@ -68,8 +68,8 @@ def JournalView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     context = {}
-    context['journal'] = PersonalJournal.objects.get(patient=request.user)
-    context['contexts'] = ContextForWeek.objects.get(patient=request.user)
+    context['journal'] = PersonalJournal.objects.all().filter(patient=request.user)
+    context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user)
 
     return render(request, 'users/journal.html', context)
 

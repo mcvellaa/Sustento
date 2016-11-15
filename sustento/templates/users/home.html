@@ -19,10 +19,13 @@
         {% if request.user.phone %}
           <p>Phone number: {{ request.user.phone }}</p>
         {% endif %}
+        <br>
+        <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Update My Name and Phone</a>
+        <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">Update My E-Mail</a>
       </div>
       <div class="col-sm-4">
         <h3>Send Reminder Text Message</h3>
-        <p>If you forget the phone number or want to make sure you can receive text messages, enter a test message below and click "Send"</p>
+        <p>If you forget the phone number for this service or want to make sure you can receive text messages, enter a test message below and click "Send"</p>
         <form class="form-horizontal" method="post" action="{% url 'users:home' %}">
           {% csrf_token %}
           {{ form|crispy }}
@@ -35,18 +38,7 @@
       </div>
       <br>
     </div>
-
-      <!-- Action buttons -->
-      <div class="row">
-
-        <div class="col-sm-12">
-          <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Update My Name and Phone</a>
-          <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">Update My E-Mail</a>
-          <!-- Your Stuff: Custom user template urls -->
-        </div>
-
-      </div>
-      <!-- End Action buttons -->
+    
   {% else %}
     <h1>Please sign in to see this page</h1>
     <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">Sign In</a>
