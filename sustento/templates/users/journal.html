@@ -9,14 +9,12 @@
   <table class="table-striped">
     {% if journal %}
         <tr>
-            <th>Name</th>
             <th>Message</th>
             <th>Date and Time</th>
             <th>Emotions</th>
         </tr>
         {% for j in journal %}
         <tr>
-            <td > {{ j.patient.name }} </td>
             <td > {{ j.entry }} </td>
             <td > {{ j.date_created }} </td>
             <td > Anger: {{ j.emotion_anger }}, Disgust: {{ j.emotion_disgust }}, Sadness: {{ j.emotion_sadness }}, Fear: {{ j.emotion_fear }}, Joy: {{ j.emotion_joy }} </td>
@@ -30,14 +28,12 @@
   <table class="table-striped">
     {% if contexts %}
         <tr>
-            <th>Name</th>
             <th>Context</th>
             <th>Start Date</th>
             <th>End Date</th>
         </tr>
         {% for c in contexts %}
         <tr>
-            <td > {{ c.patient.name }} </td>
             <td > {{ c.context }} </td>
             <td > {{ c.start_date }} </td>
             <td > {{ c.end_date }} </td>
