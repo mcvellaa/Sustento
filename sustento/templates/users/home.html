@@ -36,7 +36,6 @@
       <br>
     </div>
 
-    {% if object == request.user %}
       <!-- Action buttons -->
       <div class="row">
 
@@ -48,7 +47,6 @@
 
       </div>
       <!-- End Action buttons -->
-    {% endif %}
   {% else %}
     <h1>Please sign in to see this page</h1>
     <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">Sign In</a>
