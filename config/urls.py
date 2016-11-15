@@ -10,7 +10,7 @@ from django.views import defaults as default_views
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='sustento.users.home', permanent=False), name='home'),
+    url(r'^$', RedirectView.as_view(url='/users/', permanent=False), name='home'),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
 
     # Django Admin, use {% url 'admin:index' %}
