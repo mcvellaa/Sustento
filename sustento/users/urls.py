@@ -17,23 +17,23 @@ urlpatterns = [
         name='redirect'
     ),
     url(
-        regex=r'^(?P<username>[\w.@+-]+)/$',
-        view=views.UserDetailView.as_view(),
-        name='detail'
-    ),
-    url(
         regex=r'^~update/$',
         view=views.UserUpdateView.as_view(),
         name='update'
     ),
     url(
-        regex=r'^~send/$',
-        view=views.UserSendView,
-        name='send'
-    ),
-    url(
         regex=r'^~receive/$',
         view=views.UserReceive,
         name='receive'
+    ),
+    url(
+        regex=r'^~messages/$',
+        view=views.MessagesView,
+        name='messages'
+    ),
+    url(
+        regex=r'^~journal/$',
+        view=views.JournalView,
+        name='journal'
     ),
 ]

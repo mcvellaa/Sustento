@@ -49,15 +49,38 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
         return reverse('users:detail',
                        kwargs={'username': self.request.user.username})
 
-def UserSendView(request):
-    from .forms import UserSendForm
+class UserListView(LoginRequiredMixin, ListView):
+    model = User
+    # These next two lines tell the view to index lookups by username
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+def MessagesView(request):
+    if !request.user:
+        return HttpResponseRedirect('/accounts/login/')
+    #this is for viewing the raw messages thread
     context = {}
     context['responses'] = Response.objects.all()
     context['sentMessages'] = SentMessage.objects.all()
+
+    return render(request, 'pages/messages.html', context)
+
+def JournalView(request):
+    if !request.user:
+        return HttpResponseRedirect('/accounts/login/')
+    context = {}
     context['journal'] = PersonalJournal.objects.all()
     context['contexts'] = ContextForWeek.objects.all()
+
+    return render(request, 'pages/journal.html', context)
+
+def HomeView(request):
+    if !request.user.phone:
+        return HttpResponseRedirect({% url 'users:update' %})
+    from .forms import UserSendForm
+    context = {}
     # if this is a POST request we need to process the form data
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user:
         # create a form instance and populate it with data from the request:
         form = UserSendForm(request.POST)
         context['form'] = form
@@ -65,8 +88,8 @@ def UserSendView(request):
         if form.is_valid():
             # THIS IS WHERE I SEND TO TWILIO
             tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
-            phone_number = re.sub("(,[ ]*!.*-)$", "", request.POST.get('phone'))
-            userid = User.objects.get(phone=phone_number)
+            phone_number = request.user.phone
+            userid = request.user
             messageBody = request.POST.get('text')
             sentM = SentMessage(recipient=userid, phone=phone_number, message=messageBody)
             sentM.save()
@@ -80,7 +103,7 @@ def UserSendView(request):
         form = UserSendForm()
         context['form'] = form
 
-    return render(request, 'users/send.html', context)
+    return render(request, 'pages/home.html', context)
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
@@ -97,13 +120,6 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self):
         # Only get the User record for the user making the request
         return User.objects.get(username=self.request.user.username)
-
-
-class UserListView(LoginRequiredMixin, ListView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
 
 #this will come from Twilio, so we won't have the secret token
 @csrf_exempt
