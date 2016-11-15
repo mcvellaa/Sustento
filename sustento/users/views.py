@@ -95,7 +95,7 @@ def HomeView(request):
             message = tclient.messages.create(body=messageBody, to="+1"+phone_number, from_="+14122010448")
             # 
             # redirect to a new URL:
-            return HttpResponseRedirect('/users/~send/')
+            return HttpResponseRedirect('/users/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
