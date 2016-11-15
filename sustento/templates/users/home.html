@@ -12,12 +12,12 @@
     <div class="row">
       <div class="col-sm-8">
 
-        <h2>Username: {{ object.username }}</h2>
-        {% if object.name %}
-          <p>Full name: {{ object.name }}</p>
+        <h2>Username: {{ request.user.username }}</h2>
+        {% if request.user.name %}
+          <p>Full name: {{ request.user.name }}</p>
         {% endif %}
-        {% if object.phone %}
-          <p>Phone number: {{ object.phone }}</p>
+        {% if request.user.phone %}
+          <p>Phone number: {{ request.user.phone }}</p>
         {% endif %}
       </div>
       <div class="col-sm-4">
