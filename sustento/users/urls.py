@@ -8,6 +8,11 @@ from . import views
 urlpatterns = [
     url(
         regex=r'^$',
+        view=views.HomeView,
+        name='home'
+    ),
+    url(
+        regex=r'^~list$',
         view=views.UserListView.as_view(),
         name='list'
     ),

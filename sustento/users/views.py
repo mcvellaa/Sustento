@@ -46,8 +46,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
+        return reverse('users:home')
 
 class UserListView(LoginRequiredMixin, ListView):
     model = User
@@ -56,27 +55,27 @@ class UserListView(LoginRequiredMixin, ListView):
     slug_url_kwarg = 'username'
 
 def MessagesView(request):
-    if !request.user:
+    if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     #this is for viewing the raw messages thread
     context = {}
     context['responses'] = Response.objects.get(sender=request.user)
     context['sentMessages'] = SentMessage.objects.get(recipient=request.user)
 
-    return render(request, 'pages/messages.html', context)
+    return render(request, 'users/messages.html', context)
 
 def JournalView(request):
-    if !request.user:
+    if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     context = {}
     context['journal'] = PersonalJournal.objects.get(patient=request.user)
     context['contexts'] = ContextForWeek.objects.get(patient=request.user)
 
-    return render(request, 'pages/journal.html', context)
+    return render(request, 'users/journal.html', context)
 
 def HomeView(request):
-    if !request.user.phone:
-        return HttpResponseRedirect({% url 'users:update' %})
+    if request.user.is_authenticated() and request.user.phone == null:
+        return HttpResponseRedirect('users/update')
     from .forms import UserSendForm
     context = {}
     # if this is a POST request we need to process the form data
@@ -103,7 +102,7 @@ def HomeView(request):
         form = UserSendForm()
         context['form'] = form
 
-    return render(request, 'pages/home.html', context)
+    return render(request, 'users/home.html', context)
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
