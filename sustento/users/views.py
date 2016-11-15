@@ -74,7 +74,7 @@ def JournalView(request):
     return render(request, 'users/journal.html', context)
 
 def HomeView(request):
-    if request.user.is_authenticated() and request.user.phone == null:
+    if request.user.is_authenticated() and request.user.phone == "":
         return HttpResponseRedirect('users/update')
     from .forms import UserSendForm
     context = {}
