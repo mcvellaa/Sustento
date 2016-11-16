@@ -25,6 +25,7 @@
         {% if request.user.phone %}
           <p>Phone number: {{ request.user.phone }}</p>
         {% endif %}
+          <p>Subscribed to automated texts: {{ request.user.text_active }}</p>
         <br>
         <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Update My Name and Phone</a>
         <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">Update My E-Mail</a>
