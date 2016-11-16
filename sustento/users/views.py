@@ -196,6 +196,12 @@ def getIntentOfMsg(intents):
                 return 'ContextForWeek'
             elif d['intent'] == 'PersonalJournal':
                 return 'PersonalJournal'
+            elif d['intent'] == 'HighRisk':
+                return 'HighRisk'
+            elif d['intent'] == 'Unsubscribe':
+                return 'Unsubscribe'
+            elif d['intent'] == 'ConversationStarter':
+                return 'ConversationStarter'
         return ''
 
 @csrf_exempt
@@ -218,8 +224,31 @@ def storeUserMessage(resp, user):
         if conForWeek == '':
             conForWeek = resp['input']['text']
         # Store Context for Week
-        con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
+        con = ContextForWeek(patient=user, context=conForWeek, start_date= datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
         return 
     else:
         return
+
+#------------------------------------------------------------------------
+# SCHEDULE TEXT MESSAGES
+@csrf_exempt
+def sendUserMessage(message, user):
+    # send the text to the user through Twilio
+    tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+    phone_number = user.phone
+    message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
+    return
+
+@csrf_exempt
+import schedule
+import time
+def requestContextForWeekFromUser(user):
+    msg = 'What do you want to work on this week?'
+    schedule.every().wednesday.at("13:15").do(sendUserMessage(msg, user))
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+#------------------------------------------------------------------------
+
+
