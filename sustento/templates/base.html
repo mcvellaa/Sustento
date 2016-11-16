@@ -40,13 +40,16 @@
           <div class="collapse navbar-toggleable-xs" id="bs-navbar-collapse-1">
             <ul class="nav navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'home' %}">Home</a>
+                <a class="nav-link" href="{% url 'users:home' %}">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:messages' %}">Messages</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:journal' %}">Journal</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'about' %}">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:send' %}">Send</a>
               </li>
             </ul>
 
@@ -56,7 +59,7 @@
                   <a class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
+                  <a class="nav-link" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>

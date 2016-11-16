@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Raw Messages View{% endblock %}
+
+{% block content %}
+
+<h1>Messages Sent To You</h1>
+  <br>
+  <table class="table-striped">
+    {% if sentMessages %}
+        <tr>
+            <th>Phone Number</th>
+            <th>Date and Time</th>
+            <th>Message</th>
+        </tr>
+        {% for s in sentMessages %}
+        <tr>
+            <td > {{ s.phone }} </td>
+            <td > {{ s.date_created }} </td>
+            <td > {{ s.message }} </td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+  </table>
+  <br>
+  <h1>Messages Received From You</h1>
+  <br>
+  <table class="table-striped">
+    {% if responses %}
+        <tr>
+            <th>Phone Number</th>
+            <th>Date and Time</th>
+            <th>Message</th>
+        </tr>
+        {% for r in responses %}
+        <tr>
+            <td > {{ r.phone }} </td>
+            <td > {{ r.date_created }} </td>
+            <td > {{ r.message }} </td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+  </table>
+
+{% endblock content %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Home: {{ object.username }}{% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+
+  {% if request.user.is_authenticated %}
+    <div class="row">
+      <div class="col-sm-8">
+
+        <h2>Username: {{ request.user.username }}</h2>
+        {% if request.user.name %}
+          <p>Full name: {{ request.user.name }}</p>
+        {% endif %}
+        {% if request.user.phone %}
+          <p>Phone number: {{ request.user.phone }}</p>
+        {% endif %}
+        <br>
+        <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Update My Name and Phone</a>
+        <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">Update My E-Mail</a>
+      </div>
+      <div class="col-sm-4">
+        <h3>Send Reminder Text Message</h3>
+        <p>If you forget the phone number for this service or want to make sure you can receive text messages, enter a test message below and click "Send"</p>
+        <form class="form-horizontal" method="post" action="{% url 'users:home' %}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn">Send</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <br>
+    </div>
+    
+  {% else %}
+    <h1>Please sign in to see this page</h1>
+    <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">Sign In</a>
+  {% endif %}
+
+
+
+</div>
+{% endblock content %}

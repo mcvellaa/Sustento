@@ -47,19 +47,43 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
+        return reverse('users:home')
 
-# LOGIC HAPPENS WITHIN THIS METHOD: SEND MSG TO USER
-def UserSendView(request):
+class UserListView(LoginRequiredMixin, ListView):
+    model = User
+    # These next two lines tell the view to index lookups by username
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+def MessagesView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    #this is for viewing the raw messages thread
+    context = {}
+    context['responses'] = Response.objects.all().filter(sender=request.user)
+    context['sentMessages'] = SentMessage.objects.all().filter(recipient=request.user)
+
+    return render(request, 'users/messages.html', context)
+
+def JournalView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    context = {}
+    context['journal'] = PersonalJournal.objects.all().filter(patient=request.user)
+    context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user)
+
+    return render(request, 'users/journal.html', context)
+
+def HomeView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    elif request.user.is_authenticated() and request.user.phone == "":
+        return HttpResponseRedirect('/users/~update')
+        
     from .forms import UserSendForm
     context = {}
-    context['responses'] = Response.objects.all()
-    context['sentMessages'] = SentMessage.objects.all()
-    context['journal'] = PersonalJournal.objects.all()
-    context['contexts'] = ContextForWeek.objects.all()
     # if this is a POST request we need to process the form data
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user:
         # create a form instance and populate it with data from the request:
         form = UserSendForm(request.POST)
         context['form'] = form
@@ -67,22 +91,22 @@ def UserSendView(request):
         if form.is_valid():
             # THIS IS WHERE I SEND TO TWILIO
             tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
-            phone_number = re.sub("(,[ ]*!.*-)$", "", request.POST.get('phone'))
-            userid = User.objects.get(phone=phone_number)
+            phone_number = request.user.phone
+            userid = request.user
             messageBody = request.POST.get('text')
             sentM = SentMessage(recipient=userid, phone=phone_number, message=messageBody)
             sentM.save()
             message = tclient.messages.create(body=messageBody, to="+1"+phone_number, from_="+14122010448")
             # 
             # redirect to a new URL:
-            return HttpResponseRedirect('/users/~send/')
+            return HttpResponseRedirect('/users/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UserSendForm()
         context['form'] = form
 
-    return render(request, 'users/send.html', context)
+    return render(request, 'users/home.html', context)
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
 
@@ -93,19 +117,11 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     # send the user back to their own page after a successful update
     def get_success_url(self):
-        return reverse('users:detail',
-                       kwargs={'username': self.request.user.username})
+        return reverse('users:home')
 
     def get_object(self):
         # Only get the User record for the user making the request
         return User.objects.get(username=self.request.user.username)
-
-
-class UserListView(LoginRequiredMixin, ListView):
-    model = User
-    # These next two lines tell the view to index lookups by username
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
 
 #this will come from Twilio, so we won't have the secret token
 @csrf_exempt
@@ -123,7 +139,7 @@ def UserReceive(request):
         #now get automated response
         respToUser = getResponseForMessage(respMessage, userid)
         # save the sent message in the database
-        sentM = SentMessage(recipient=userid, phone=respPhone, message=respToUser[0])
+        sentM = SentMessage(recipient=userid, phone=respPhone, message=respToUser)
         sentM.save()
         # send the text to the user through Twilio
         tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
@@ -152,20 +168,58 @@ def getResponseForMessage(msg, user):
     storeUserMessage(response2, user)
 
     # Send response to User
-    automatedResp = response2['output']['text']
+    if response2['output']['text']:
+        automatedResp = response2['output']['text'][0]
+    else:
+        automatedResp = 'Got it, have a great rest of your day!'
     return automatedResp
 
 @csrf_exempt
+def getContextForWeek(entities):
+    # Entities is a list of dictionaries of different entities identified by Watson Conversation. We want value of entity titled ContextForWeek.
+    if len(entities) < 1:
+        return ''
+    else:
+        for d in entities:
+            if d['entity'] == 'ContextForWeek':
+                return d['value']
+        return ''
+
+@csrf_exempt
+def getIntentOfMsg(intents):
+    # Intents is a list of dictionaries of different intents identified by Watson Conversation. We want to see if intent = PersonalJournal, ContextForWeek or others
+    if len(intents) < 1:
+        return ''
+    else:
+        for d in intents:
+            if d['intent'] == 'ContextForWeek':
+                return 'ContextForWeek'
+            elif d['intent'] == 'PersonalJournal':
+                return 'PersonalJournal'
+        return ''
+
+@csrf_exempt
 def storeUserMessage(resp, user):
-    # 2. Perform analysis if personal journal
-    # 3. Store sentiment analysis results
-    # If intent = personal journal --> Sentiment Analysis
-    if 'PersonalJournal' in resp['intents'][0]['intent']:
+    msgIntent = getIntentOfMsg(resp['intents'])
+    # If Personal Journal:
+        # 1. Perform analysis
+        # 2. Store sentiment analysis results
+    if msgIntent == 'PersonalJournal':
         sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
         journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
         journalEntry.save()
-    elif 'ContextForWeek' in resp['intents'][0]['intent']:
-        con = ContextForWeek(patient=user, context=resp['entities'][0]['value'], start_date=datetime.today(), end_date=(datetime.today() + datetime.timedelta(days=7)))
+        return
+    # If Context For Week: Store Context For Week
+    elif msgIntent == 'ContextForWeek':
+        entities = resp['entities']
+        # Get value of entity=contextForWeek if exists
+        conForWeek = getContextForWeek(entities)
+        # Else context = entire message
+        if conForWeek == '':
+            conForWeek = resp['input']['text']
+        # Store Context for Week
+        con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
+        return 
     else:
         return
