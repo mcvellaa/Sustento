@@ -195,6 +195,12 @@ def getIntentOfMsg(intents):
                 return 'ContextForWeek'
             elif d['intent'] == 'PersonalJournal':
                 return 'PersonalJournal'
+            elif d['intent'] == 'HighRisk':
+                return 'HighRisk'
+            elif d['intent'] == 'Unsubscribe':
+                return 'Unsubscribe'
+            elif d['intent'] == 'ConversationStarter':
+                return 'ConversationStarter'
         return ''
 
 @csrf_exempt
@@ -220,5 +226,12 @@ def storeUserMessage(resp, user):
         con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
         return 
+    elif msgIntent == 'Unsubscribe':
+        deactivateUser(user)
     else:
         return
+
+def deactivateUser(user):
+    user.text_active = False
+    user.save()
+
