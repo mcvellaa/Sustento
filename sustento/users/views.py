@@ -246,7 +246,7 @@ def sendUserMessage(message, user):
 @csrf_exempt
 def UserSchedule(request):
     user = User.objects.get(phone="2035601401")
-    sendUserMessage(datetime..datetime.strftime(datetime.datetime.now(), "%c"), user)
+    sendUserMessage(datetime.datetime.strftime(datetime.datetime.now(), "%c"), user)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
 #import schedule
