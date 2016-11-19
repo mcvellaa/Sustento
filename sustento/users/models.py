@@ -43,6 +43,13 @@ class ContextForWeek(models.Model):
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=True)
 
+    def get_journal_entries(self):
+        journal_entries = PersonalJournal.objects.all().filter(date_created>=self.start_date)
+        if self.end_date is not None:
+            return journal_entries.filter(date_created <= self.end_date)
+        else:
+            return journal_entries
+
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)

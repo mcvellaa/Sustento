@@ -74,6 +74,15 @@ def JournalView(request):
 
     return render(request, 'users/journal.html', context)
 
+def DashboardView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    # Get Contexts in descending order: latest context is first
+    context = {}
+    context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
+    return render(request, 'users/dashboard.html', context)
+
+
 def HomeView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
@@ -164,7 +173,7 @@ def getResponseForMessage(msg, user):
       context=response1['context']
     )
 
-    #Store Msg + Sentiment Analysis if appropriate
+    #Process Intent + Store Msg + Sentiment Analysis if appropriate
     storeUserMessage(response2, user)
 
     # Send response to User
@@ -227,8 +236,14 @@ def storeUserMessage(resp, user):
         con = ContextForWeek(patient=user, context=conForWeek, start_date= datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
         return 
+    elif msgIntent == 'Unsubscribe':
+        deactivateUser(user)
     else:
         return
+
+def deactivateUser(user):
+    user.text_active = False
+    user.save()
 
 #------------------------------------------------------------------------
 # SCHEDULE TEXT MESSAGES

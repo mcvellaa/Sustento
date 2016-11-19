@@ -1,0 +1,41 @@
+<!-- Dashboard: 
+	 Filter Bar: Search by Context or Date
+	 Instagram Style: Context For Week + Personal Journal Entries
+	 Sticky Legend on Right
+ -->
+
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Title -->
+{% block title %}Dashboard{% endblock %}
+
+<!-- Filter Bar -->
+
+<!-- Color Legend on Right -->
+
+<!-- Context + Personal Journal Entries -->
+{% block content %}
+
+{% for c in contexts %}
+<div class='col-md-12 panel'>
+	<!-- Context + Start/ End Dates -->
+	<div class='panel-heading'>
+		<div class='col-md-8'>{{ c.context }}</div>
+		<div class='col-md-4'>{{ c.start_date }} - {{ c.end_date }}</div>
+	</div>
+	<!-- Personal Journal Entries For Given Context -->
+	<div class='panel-body'>
+		<table class='table'>
+			<tr>
+				{% for j in c.get_journal_entries %}
+					<td class='col-md-4'> {{j.entry}} </td>
+				{% endfor %}
+			</tr>
+		</table>
+	</div>
+</div>
+{% endfor %}
+
+{% endblock content %}
+
