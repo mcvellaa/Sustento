@@ -248,7 +248,7 @@ import schedule
 import time
 def requestContextForWeekFromUser(user):
     msg = 'What do you want to work on this week?'
-    schedule.every().saturday.at("12:05").do(sendUserMessage, msg, user)
+    schedule.every(0.5).minutes.do(sendUserMessage, msg, user)
     while True:
         schedule.run_pending()
         time.sleep(1)
