@@ -247,7 +247,7 @@ def sendUserMessage(message, user):
 @csrf_exempt
 def UserSchedule(request):
     user = User.objects.get(phone="2035601401")
-    sendUserMessage(datetime.datetime.now(), user)
+    sendUserMessage(datetime.datetime.now().strftime(%c), user)
 
 #import schedule
 #import time
