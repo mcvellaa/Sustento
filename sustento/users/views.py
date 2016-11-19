@@ -235,3 +235,25 @@ def deactivateUser(user):
     user.text_active = False
     user.save()
 
+#------------------------------------------------------------------------
+# SCHEDULE TEXT MESSAGES
+def sendUserMessage(message, user):
+    # send the text to the user through Twilio
+    tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+    phone_number = user.phone
+    message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
+    return
+
+import schedule
+import time
+def requestContextForWeekFromUser(user):
+    msg = 'What do you want to work on this week?'
+    schedule.every().saturday.at("12:05").do(sendUserMessage, msg, user)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+for user in User.objects.all():
+    if user.phone != "":
+        requestContextForWeekFromUser(user)
+#------------------------------------------------------------------------
