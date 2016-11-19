@@ -4,6 +4,7 @@
 # Verified bug on Python 3.5.1
 wheel==0.29.0
 
+schedule
 twilio==5.6.0
 whitenoise
 watson_developer_cloud
