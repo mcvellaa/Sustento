@@ -248,6 +248,7 @@ def sendUserMessage(message, user):
 def UserSchedule(request):
     user = User.objects.get(phone="2035601401")
     sendUserMessage(datetime.datetime.now().strftime(%c), user)
+    return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
 #import schedule
 #import time
