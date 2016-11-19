@@ -242,12 +242,11 @@ def sendUserMessage(message, user):
     tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
     phone_number = user.phone
     message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
-    return
 
 @csrf_exempt
 def UserSchedule(request):
     user = User.objects.get(phone="2035601401")
-    sendUserMessage(datetime.datetime.now().strftime(%c), user)
+    sendUserMessage(datetime.strptime(datetime.datetime.now(), "%c"), user)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
 #import schedule
