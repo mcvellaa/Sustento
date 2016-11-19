@@ -244,16 +244,25 @@ def sendUserMessage(message, user):
     message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
     return
 
-import schedule
-import time
-def requestContextForWeekFromUser(user):
-    msg = 'What do you want to work on this week?'
-    schedule.every(0.5).minutes.do(sendUserMessage, msg, user)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+@csrf_exempt
+def UserSchedule(request):
+    user = User.objects.filter(phone="2035601401")
+    sendUserMessage(datetime.now(), user)
 
-for user in User.objects.all():
-    if user.phone != "":
-        requestContextForWeekFromUser(user)
+#import schedule
+#import time
+#import threading
+
+#def run_threaded(job_func, *kwargs):
+#    job_thread = threading.Thread(target=job_func, args=kwargs)
+#    job_thread.start()
+
+#def requestContextForWeekFromUser(user):
+#    msg = 'What do you want to work on this week?'
+#    schedule.every(0.1).minutes.do(sendUserMessage, msg, user)
+#    schedule.run_pending()
+
+#for user in User.objects.all():
+#    if user.phone != "":
+#        run_threaded(requestContextForWeekFromUser, user)
 #------------------------------------------------------------------------
