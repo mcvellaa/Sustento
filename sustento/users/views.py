@@ -227,12 +227,18 @@ def storeUserMessage(resp, user):
         con = ContextForWeek(patient=user, context=conForWeek, start_date= datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
         con.save()
         return 
+    elif msgIntent == 'Unsubscribe':
+        deactivateUser(user)
     else:
         return
 
+
+def deactivateUser(user):
+    user.text_active = False
+    user.save()
+
 #------------------------------------------------------------------------
 # SCHEDULE TEXT MESSAGES
-@csrf_exempt
 def sendUserMessage(message, user):
     # send the text to the user through Twilio
     tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
@@ -241,14 +247,24 @@ def sendUserMessage(message, user):
     return
 
 @csrf_exempt
-import schedule
-import time
-def requestContextForWeekFromUser(user):
-    msg = 'What do you want to work on this week?'
-    schedule.every().wednesday.at("13:15").do(sendUserMessage(msg, user))
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+def UserSchedule(request):
+    user = User.objects.filter(phone="2035601401")
+    sendUserMessage(datetime.datetime.now(), user)
+
+#import schedule
+#import time
+#import threading
+
+#def run_threaded(job_func, *kwargs):
+#    job_thread = threading.Thread(target=job_func, args=kwargs)
+#    job_thread.start()
+
+#def requestContextForWeekFromUser(user):
+#    msg = 'What do you want to work on this week?'
+#    schedule.every(0.1).minutes.do(sendUserMessage, msg, user)
+#    schedule.run_pending()
+
+#for user in User.objects.all():
+#    if user.phone != "":
+#        run_threaded(requestContextForWeekFromUser, user)
 #------------------------------------------------------------------------
-
-

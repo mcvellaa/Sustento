@@ -32,6 +32,11 @@ urlpatterns = [
         name='receive'
     ),
     url(
+        regex=r'^~schedule/$',
+        view=views.UserSchedule,
+        name='schedule'
+    ),
+    url(
         regex=r'^~messages/$',
         view=views.MessagesView,
         name='messages'
