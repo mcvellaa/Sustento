@@ -222,14 +222,15 @@ def storeUserMessage(resp, user):
         # Else context = entire message
         if conForWeek == '':
             conForWeek = resp['input']['text']
-        # Store Context for Week
-        con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.datetime.now(), end_date=(datetime.datetime.now() + datetime.timedelta(days=7)))
-        con.save()
         # End any previous contexts
         previousContexts = ContextForWeek.objects.filter(end_date__gt=datetime.datetime.now())
         for con in previousContexts:
             con.end_date = datetime.datetime.now()
             con.save()
+        # Store Context for Week
+        con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.datetime.now(), end_date=(datetime.datetime.now() + datetime.timedelta(days=7)))
+        con.save()
+        
     elif msgIntent == 'Unsubscribe':
         deactivateUser(user)
     else:
