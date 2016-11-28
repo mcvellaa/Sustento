@@ -75,7 +75,6 @@ def JournalView(request):
     for con in previousContexts:
         con.end_date = datetime.datetime.now()
         con.save()
-    return
 
     return render(request, 'users/journal.html', context)
 
