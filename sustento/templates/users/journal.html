@@ -17,11 +17,11 @@
         <tr>
             <td > {{ j.entry }} </td>
             <td > {{ j.date_created }} </td>
-            <td > {% if j.emotion_anger > 0.1 %}Anger: {{ j.emotion_anger }}{% endif %}, 
-                  {% if j.emotion_disgust > 0.1 %}Disgust: {{ j.emotion_disgust }}{% endif %}, 
-                  {% if j.emotion_sadness > 0.1 %}Sadness: {{ j.emotion_sadness }}{% endif %}, 
-                  {% if j.emotion_fear > 0.1 %}Fear: {{ j.emotion_fear }}{% endif %}, 
-                  {% if j.emotion_joy > 0.1 %}Joy: {{ j.emotion_joy }}{% endif %} </td>
+            <td > {% if j.emotion_anger %}Anger: {{ j.emotion_anger }}{% endif %}, 
+                  {% if j.emotion_disgust %}Disgust: {{ j.emotion_disgust }}{% endif %}, 
+                  {% if j.emotion_sadness %}Sadness: {{ j.emotion_sadness }}{% endif %}, 
+                  {% if j.emotion_fear %}Fear: {{ j.emotion_fear }}{% endif %}, 
+                  {% if j.emotion_joy %}Joy: {{ j.emotion_joy }}{% endif %} </td>
         </tr>
         {% endfor %}
     {% endif %}
