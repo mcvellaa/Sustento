@@ -17,11 +17,11 @@
         <tr>
             <td > {{ j.entry }} </td>
             <td > {{ j.date_created }} </td>
-            <td > {% if float(re.findall(r'\d.+', j.emotion_anger)[0]) > 0.1 %}Anger: {{ j.emotion_anger }}{% endif %}, 
-                  {% if float(re.findall(r'\d.+', j.emotion_disgust)[0]) > 0.1 %}Disgust: {{ j.emotion_disgust }}{% endif %}, 
-                  {% if float(re.findall(r'\d.+', j.emotion_sadness)[0]) > 0.1 %}Sadness: {{ j.emotion_sadness }}{% endif %}, 
-                  {% if float(re.findall(r'\d.+', j.emotion_fear)[0]) > 0.1 %}Fear: {{ j.emotion_fear }}{% endif %}, 
-                  {% if float(re.findall(r'\d.+', j.emotion_joy)[0]) > 0.1 %}Joy: {{ j.emotion_joy }}{% endif %} </td>
+            <td > {% if (float(re.findall(r'\d.+', j.emotion_anger)[0]) > 0.1) %}Anger: {{ j.emotion_anger }}{% endif %}, 
+                  {% if (float(re.findall(r'\d.+', j.emotion_disgust)[0]) > 0.1) %}Disgust: {{ j.emotion_disgust }}{% endif %}, 
+                  {% if (float(re.findall(r'\d.+', j.emotion_sadness)[0]) > 0.1) %}Sadness: {{ j.emotion_sadness }}{% endif %}, 
+                  {% if (float(re.findall(r'\d.+', j.emotion_fear)[0]) > 0.1) %}Fear: {{ j.emotion_fear }}{% endif %}, 
+                  {% if (float(re.findall(r'\d.+', j.emotion_joy)[0]) > 0.1) %}Joy: {{ j.emotion_joy }}{% endif %} </td>
         </tr>
         {% endfor %}
     {% endif %}
