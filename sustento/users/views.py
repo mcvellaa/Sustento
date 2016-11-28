@@ -71,11 +71,6 @@ def JournalView(request):
     context['journal'] = PersonalJournal.objects.all().filter(patient=request.user).order_by('-date_created')
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
 
-    previousContexts = ContextForWeek.objects.filter(end_date__gt=datetime.datetime.now())
-    for con in previousContexts:
-        con.end_date = datetime.datetime.now()
-        con.save()
-
     return render(request, 'users/journal.html', context)
 
 def HomeView(request):
