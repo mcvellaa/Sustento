@@ -70,7 +70,12 @@ def JournalView(request):
     context = {}
     context['journal'] = PersonalJournal.objects.all().filter(patient=request.user).order_by('-date_created')
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
+
     previousContexts = ContextForWeek.objects.filter(end_date__gt=datetime.datetime.now())
+    for con in previousContexts:
+        con.end_date = datetime.datetime.now()
+        con.save()
+    return
 
     return render(request, 'users/journal.html', context)
 
@@ -228,7 +233,6 @@ def storeUserMessage(resp, user):
         con.save()
         # End any previous contexts
         
-        return 
     elif msgIntent == 'Unsubscribe':
         deactivateUser(user)
     else:
