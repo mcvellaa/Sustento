@@ -226,7 +226,7 @@ def storeUserMessage(resp, user):
         con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.date.now(), end_date=(datetime.date.now() + datetime.timedelta(days=7)))
         con.save()
         # End any previous contexts
-        previousContexts = ContextForWeek.objects.get(end_date > datetime.datetime.now())
+        previousContexts = ContextForWeek.objects.filter(end_date > datetime.datetime.now())
         print(previousContexts)
         return 
     elif msgIntent == 'Unsubscribe':
