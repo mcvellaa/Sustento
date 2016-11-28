@@ -17,11 +17,7 @@
         <tr>
             <td > {{ j.entry }} </td>
             <td > {{ j.date_created }} </td>
-            <td > Anger: {{ j.emotion_anger }}, 
-                  Disgust: {{ j.emotion_disgust }}, 
-                  Sadness: {{ j.emotion_sadness }}, 
-                  Fear: {{ j.emotion_fear }}, 
-                  Joy: {{ j.emotion_joy }} </td>
+            <td > Anger: {{ j.emotion_anger }}, Disgust: {{ j.emotion_disgust }}, Sadness: {{ j.emotion_sadness }}, Fear: {{ j.emotion_fear }}, Joy: {{ j.emotion_joy }} </td>
         </tr>
         {% endfor %}
     {% endif %}
@@ -46,5 +42,4 @@
     {% endif %}
   </table>
 
-{% endblock %}
 {% endblock content %}

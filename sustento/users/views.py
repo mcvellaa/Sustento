@@ -68,7 +68,6 @@ def JournalView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     context = {}
-    context['re'] = re
     context['journal'] = PersonalJournal.objects.all().filter(patient=request.user).order_by('-date_created')
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
 
