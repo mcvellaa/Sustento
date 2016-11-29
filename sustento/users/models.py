@@ -43,6 +43,7 @@ class ContextForWeek(models.Model):
 
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
+    context = models.ForeignKey(ContextForWeek)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     entry = models.CharField(max_length=2000)
     emotion_anger = models.CharField(max_length=15, blank=True)

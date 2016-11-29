@@ -230,7 +230,7 @@ def storeUserMessage(resp, user):
         # 2. Store sentiment analysis results
     if msgIntent == 'PersonalJournal':
         sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=ContextForWeek.objects.latest(), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
         journalEntry.save()
         return
     # If Context For Week: Store Context For Week

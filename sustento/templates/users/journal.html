@@ -29,7 +29,7 @@
                     <th>Emotions</th>
                 </tr>
                 {% for j in journal %}
-                    {% if (j.date_created < c.end_date) and (j.date_created > c.start_date) %}
+                    {% if j.context == c %}
                     <tr>
                         <td > {{ j.entry }} </td>
                         <td > {{ j.date_created }} </td>
@@ -44,17 +44,19 @@
     {% endif %}
 
 
-   <h1>Journal Entries</h1>
-    <br>
+  <h1>Journal Entries</h1>
+  <br>
   <table class="table-striped" cellpadding="10">
     {% if journal %}
         <tr>
+            <th>Context</th>
             <th>Message</th>
             <th>Date and Time</th>
             <th>Emotions</th>
         </tr>
         {% for j in journal %}
         <tr>
+            <td > {{ j.context.context }} </td>
             <td > {{ j.entry }} </td>
             <td > {{ j.date_created }} </td>
             <td > Anger: {{ j.emotion_anger }}, Disgust: {{ j.emotion_disgust }}, Sadness: {{ j.emotion_sadness }}, Fear: {{ j.emotion_fear }}, Joy: {{ j.emotion_joy }} </td>
