@@ -20,7 +20,7 @@
 
     {% if journal and contexts %}
         {% for c in contexts %}
-        <h3> {{ c.context }} </h3>
+        <h3> {{ c.context }}, {{ c.start_date }} to {{ c.end_date }} </h3>
 
             <table class="table-striped" cellpadding="10">
                 <tr>
