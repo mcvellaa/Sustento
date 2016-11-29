@@ -67,9 +67,28 @@ def MessagesView(request):
 def JournalView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
+    from .forms import JournalEntryForm
     context = {}
     context['journal'] = PersonalJournal.objects.all().filter(patient=request.user).order_by('-date_created')
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
+    if request.method == 'POST' and request.user:
+        # create a form instance and populate it with data from the request:
+        form = JournalEntryForm(request.POST)
+        context['form'] = form
+        # check whether it's valid:
+        if form.is_valid():
+            # Get the emotions back
+            userid = request.user
+            messageBody = request.POST.get('text')
+            sentimentAnalysis = alchemy_language.emotion(text=messageBody)
+            journalEntry = PersonalJournal(patient=userid, entry=messageBody, emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+            journalEntry.save()
+            # redirect to a new URL:
+            return HttpResponseRedirect('/users/~journal/')
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = JournalEntryForm()
+        context['form'] = form
 
     return render(request, 'users/journal.html', context)
 

@@ -6,6 +6,24 @@
 
  <h1>Journal Entries</h1>
   <br>
+    <div>
+        <button style="margin:7px 15px 17px 0;" type="button" data-placement="bottom" class="btn btn-md btn-success" data-toggle="popover" title="New Journal Entry" data-content='<form class="form-horizontal" method="post" action="{% url "users:home" %}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-outline-success">Send</button>
+            </div>
+          </div>
+        </form>'>Enter New Journal Entry</button>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="popover"]').popover();   
+        });
+    </script>
+  <br>
   <table class="table-striped" cellpadding="10">
     {% if journal %}
         <tr>
