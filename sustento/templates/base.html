@@ -79,16 +79,20 @@
               <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
           {% endfor %}
       {% endif %}
+      
+      <br><br><br><br>
 
       {% block content %}
       
       {% endblock content %}
 
+      <br>
       <footer>
         {% if request.user.is_authenticated %}
-            <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a><a class="btn btn-outline-secondary" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
+            <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>    <a class="btn btn-outline-secondary" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
         {% endif %}
       </footer>
+      <br>
 
     </div> <!-- /container -->
 
