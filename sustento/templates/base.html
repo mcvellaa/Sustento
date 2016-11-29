@@ -56,12 +56,6 @@
             <ul class="nav navbar-nav pull-xs-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
                 </li>
               {% else %}
@@ -91,6 +85,17 @@
       {% endblock content %}
 
     </div> <!-- /container -->
+
+    <footer>
+      {% if request.user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
+        </li>
+      {% endif %}
+    </footer>
 
     {% block modal %}{% endblock modal %}
 
