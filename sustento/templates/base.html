@@ -88,12 +88,7 @@
 
     <footer>
       {% if request.user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
-        </li>
+          <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a><a class="btn btn-outline-secondary" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
       {% endif %}
     </footer>
 
