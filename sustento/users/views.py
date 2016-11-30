@@ -101,6 +101,31 @@ def DashboardView(request):
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
     return render(request, 'users/dashboard.html', context)
 
+def RemindersView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    from .forms import RemindersForm
+    context = {}
+    context['reminders'] = Reminders.objects.filter(patient=request.user)
+    if request.method == 'POST' and request.user:
+    # create a form instance and populate it with data from the request:
+        form = RemindersForm(request.POST)
+        context['form'] = form
+        # check whether it's valid:
+        if form.is_valid():
+            userid = request.user
+            when = request.POST.get('when')
+            text = request.POST.get('text')
+            remind = Reminders(patient=userid, when=when, text=text)
+            remind.save()
+            return HttpResponseRedirect('/users/~reminders/')
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = RemindersForm()
+        context['form'] = form
+
+    return render(request, 'users/reminders.html', context)
+
 
 def HomeView(request):
     if request.user.is_authenticated() == False:

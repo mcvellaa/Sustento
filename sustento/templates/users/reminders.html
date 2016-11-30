@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}My Reminders{% endblock %}
+
+{% block content %}
+
+    <div class='jumbotron'>
+        <h3>Add New Reminder</h3>
+        <form class="form-horizontal" method="post" action="{% url 'users:journal' %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn btn-outline-success">Create Reminder</button>
+            </div>
+            </div>
+        </form>
+    </div>
+    <h3> Reminders </h3>
+    {% if reminders %}
+      <table class="table-striped" cellpadding="10">
+        <tr>
+            <th>Date and Time</th>
+            <th>Text</th>
+        </tr>
+        {% for r in reminders %}
+            <tr>
+                <td> {{ r.when }} </td>
+                <td> {{ r.text }} </td>
+            </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+
+{% endblock content %}
