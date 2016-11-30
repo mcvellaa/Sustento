@@ -44,11 +44,14 @@ class ContextForWeek(models.Model):
     end_date = models.DateTimeField(blank=True)
 
     def get_journal_entries(self):
-        journal_entries = PersonalJournal.objects.all().filter(date_created>=self.start_date)
-        if self.end_date is not None:
-            return journal_entries.filter(date_created <= self.end_date)
-        else:
-            return journal_entries
+        return PersonalJournal.objects.filter(context = self.id).order_by('-date_created')
+
+    def print_start_date(self):
+        from datetime import datetime
+        return self.start_date.strftime('%b %m, %y')
+    def print_end_date(self):
+        from datetime import datetime
+        return self.end_date.strftime('%b %m, %y')
 
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
@@ -60,3 +63,28 @@ class PersonalJournal(models.Model):
     emotion_sadness = models.CharField(max_length=15, blank=True)
     emotion_fear = models.CharField(max_length=15, blank=True)
     emotion_joy = models.CharField(max_length=15, blank=True)
+
+    def print_time(self):
+        from datetime import datetime
+        return self.date_created.strftime('%m/%d/%y %H:%M')
+
+    def get_dominant_mood(self):
+        emotions = [float(self.emotion_anger), float(self.emotion_disgust), float(self.emotion_sadness), float(self.emotion_fear), float(self.emotion_joy)]
+        dominant_emotion_index = emotions.index(max(emotions))
+        dominant_emotion = ''
+        if dominant_emotion_index == 0:
+            dominant_emotion = 'Anger'
+        elif dominant_emotion_index == 1:
+            dominant_emotion = 'Disgust'
+        elif dominant_emotion_index == 2:
+            dominant_emotion = 'Sadness'
+        elif dominant_emotion_index == 3:
+            dominant_emotion = 'Fear'
+        else:
+            dominant_emotion = 'Joy'
+        print('Emotion: ', dominant_emotion)
+        return dominant_emotion
+
+
+
+
