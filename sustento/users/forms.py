@@ -19,5 +19,5 @@ class RemindersForm(forms.ModelForm):
         model = Reminders
         fields = ['when', 'text']
         widgets = {
-            'whehn': DateInput(),
+            'when': DateInput(),
         }
