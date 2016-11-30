@@ -16,6 +16,7 @@ from twilio.rest import TwilioRestClient
 import os
 import re
 import datetime
+
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -92,11 +93,21 @@ def JournalView(request):
 
     return render(request, 'users/journal.html', context)
 
+def DashboardView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    # Get Contexts in descending order: latest context is first
+    context = {}
+    context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
+    return render(request, 'users/dashboard.html', context)
+
+
 def HomeView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     elif request.user.is_authenticated() and request.user.phone == "":
         return HttpResponseRedirect('/users/~update')
+        
     from .forms import UserSendForm
     context = {}
     # if this is a POST request we need to process the form data
@@ -167,7 +178,6 @@ def UserReceive(request):
     else:
         return HttpResponseRedirect('/users/~send/')
 
-@csrf_exempt
 def getResponseForMessage(msg, user):
     # conversation starter: Hi
     response1 = conversation.message(
@@ -182,7 +192,7 @@ def getResponseForMessage(msg, user):
       context=response1['context']
     )
 
-    #Store Msg + Sentiment Analysis if appropriate
+    #Process Intent + Store Msg + Sentiment Analysis if appropriate
     storeUserMessage(response2, user)
 
     # Send response to User

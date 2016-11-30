@@ -46,4 +46,9 @@ urlpatterns = [
         view=views.JournalView,
         name='journal'
     ),
+    url(
+        regex=r'^~dashboard/$',
+        view=views.DashboardView,
+        name='dashboard'
+    )
 ]

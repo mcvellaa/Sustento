@@ -1,0 +1,96 @@
+<!-- Dashboard: 
+	 Filter Bar: Search by Context or Date
+	 Instagram Style: Context For Week + Personal Journal Entries
+	 Sticky Legend on Right
+ -->
+
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Address Bar Title -->
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class='container'>
+	<!-- Title -->
+	<div class='row'>
+		<h3> Dashboard </h3>
+	</div>
+
+	<!-- Filter Bar -->
+	<div class='row'>
+		<form>
+			<!-- Search Contexts -->
+			
+			<!-- Specific Date: within a given range for Context -->
+		</form>
+	</div>
+
+	<div class='row'>
+		<div class='col-md-10 col-sm-10 col-xs-10 col-lg-10'>
+			<!-- Context + Personal Journal Entries -->
+			{% for c in contexts %}
+				<div class='card'>
+					<!-- Heading: Context + Start/ End Dates -->
+					<div class='card-header'>
+						<div class='col-md-8 col-sm-8 col-xs-8 col-lg-8'>{{ c.context }}</div>
+						<div class='col-md-4 col-sm-8 col-xs-8 col-lg-8 text-xs-right text-sm-right text-md-right text-lg-right'>{{ c.print_start_date }} - {{ c.print_end_date }}</div>
+					</div>
+					<!-- Body: Personal Journal Entries For Given Context -->
+					<div class='card-block'>
+						{% for j in c.get_journal_entries %}
+							<!-- Background Color of Journal Entry Based on Dominant Mood -->
+							{% with dm=j.get_dominant_mood %}
+								{% if dm == "Anger" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-danger'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% elif dm == "Disgust" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-success'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% elif dm == "Sadness" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-info'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% elif dm == "Fear" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-fear'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% else %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-joy'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% endif %}
+							{% endwith %}
+						{% endfor %}
+					</div>
+					<!-- Footer: End of Week -->
+					<div class='card-footer'>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		<div class='col-md-2 col-sm-2 col-xs-2 col-lg-2'>
+			<!-- TO BE FIXED: Center text not working -->
+			<!-- Color Legend on Right -->
+			<div class='col-md-12 col-lg-12 col-xs-12 col-sm-12 rounded bg-danger card'>
+				<div class='card-block'>Anger</div>
+			</div>
+			<div class='col-md-12 col-lg-12 col-xs-12 col-sm-12 rounded bg-fear card'><div class='card-block'>Fear</div></div>
+			<div class='col-md-12 col-lg-12 col-xs-12 col-sm-12 rounded bg-success card'><div class='card-block'>Disgust</div></div>
+			<div class='col-md-12 col-lg-12 col-xs-12 col-sm-12 rounded bg-info card'><div class='card-block'>Sadness</div></div>
+			<div class='col-md-12 col-lg-12 col-xs-12 col-sm-12 rounded bg-joy card'><div class='card-block'>Joy</div></div>
+		</div>
+	</div>
+	
+</div>
+
+{% endblock content %}
+
