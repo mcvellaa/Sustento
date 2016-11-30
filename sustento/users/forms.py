@@ -1,5 +1,6 @@
 from django import forms
 import datetime
+from .models import Reminders
 
 class UserSendForm(forms.Form):
 #    def __init__(self, *args, **kwargs):
