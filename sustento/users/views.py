@@ -68,9 +68,28 @@ def MessagesView(request):
 def JournalView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
+    from .forms import JournalEntryForm
     context = {}
     context['journal'] = PersonalJournal.objects.all().filter(patient=request.user).order_by('-date_created')
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
+    if request.method == 'POST' and request.user:
+        # create a form instance and populate it with data from the request:
+        form = JournalEntryForm(request.POST)
+        context['form'] = form
+        # check whether it's valid:
+        if form.is_valid():
+            # Get the emotions back
+            userid = request.user
+            messageBody = request.POST.get('text')
+            sentimentAnalysis = alchemy_language.emotion(text=messageBody)
+            journalEntry = PersonalJournal(patient=userid, entry=messageBody, context=ContextForWeek.objects.filter(patient=userid).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+            journalEntry.save()
+            # redirect to a new URL:
+            return HttpResponseRedirect('/users/~journal/')
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = JournalEntryForm()
+        context['form'] = form
 
     return render(request, 'users/journal.html', context)
 
@@ -221,7 +240,7 @@ def storeUserMessage(resp, user):
         # 2. Store sentiment analysis results
     if msgIntent == 'PersonalJournal':
         sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=ContextForWeek.objects.filter(patient=user).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
         journalEntry.save()
         return
     # If Context For Week: Store Context For Week
@@ -232,10 +251,15 @@ def storeUserMessage(resp, user):
         # Else context = entire message
         if conForWeek == '':
             conForWeek = resp['input']['text']
+        # End any previous contexts
+        previousContexts = ContextForWeek.objects.filter(end_date__gt=datetime.datetime.now())
+        for con in previousContexts:
+            con.end_date = datetime.datetime.now()
+            con.save()
         # Store Context for Week
-        con = ContextForWeek(patient=user, context=conForWeek, start_date= datetime.date.today(), end_date=(datetime.date.today() + datetime.timedelta(days=7)))
+        con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.datetime.now(), end_date=(datetime.datetime.now() + datetime.timedelta(days=7)))
         con.save()
-        return 
+        
     elif msgIntent == 'Unsubscribe':
         deactivateUser(user)
     else:
@@ -252,12 +276,12 @@ def sendUserMessage(message, user):
     tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
     phone_number = user.phone
     message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
-    return
 
 @csrf_exempt
 def UserSchedule(request):
-    user = User.objects.filter(phone="2035601401")
-    sendUserMessage(datetime.datetime.now(), user)
+    #user = User.objects.get(phone="2035601401")
+    #sendUserMessage(datetime.datetime.strftime(datetime.datetime.now(), "%c"), user)
+    return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
 #import schedule
 #import time

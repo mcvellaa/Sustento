@@ -29,7 +29,7 @@
   <body>
 
     <div class="m-b-1">
-      <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+      <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;">
         <div class="container">
           <a class="navbar-brand" href="/">Sustento</a>
           <button type="button" class="navbar-toggler hidden-sm-up pull-xs-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
@@ -56,12 +56,6 @@
             <ul class="nav navbar-nav pull-xs-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
                 </li>
               {% else %}
@@ -82,15 +76,27 @@
 
       {% if messages %}
           {% for message in messages %}
+              <br><br>
               <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
           {% endfor %}
       {% endif %}
+      
+      <br><br>
 
       {% block content %}
       
       {% endblock content %}
 
+      <br>
+      <footer>
+        {% if request.user.is_authenticated %}
+            <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>    <a class="btn btn-outline-secondary" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
+        {% endif %}
+      </footer>
+      <br>
+
     </div> <!-- /container -->
+
 
     {% block modal %}{% endblock modal %}
 
