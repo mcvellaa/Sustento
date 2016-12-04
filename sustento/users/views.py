@@ -99,6 +99,14 @@ def DashboardView(request):
     # Get Contexts in descending order: latest context is first
     context = {}
     context['contexts'] = ContextForWeek.objects.all().filter(patient=request.user).order_by('-start_date')
+    # Filter if user has entered any filter params
+    if request.method=='GET':
+        searchContext = request.GET.get('searchContextBox', None)
+        searchDate = request.GET.get('searchDateBox', None)
+        if (searchContext != None and searchContext != ''):
+            context['contexts'] = context['contexts'].filter(context__icontains=searchContext).order_by('-start_date')
+        if (searchDate != None and searchDate != ''):
+            context['contexts'] = context['contexts'].filter(start_date__lte = searchDate) & context['contexts'].filter(end_date__gte = searchDate).order_by('-start_date')
     return render(request, 'users/dashboard.html', context)
 
 
