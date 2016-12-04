@@ -109,6 +109,31 @@ def DashboardView(request):
             context['contexts'] = context['contexts'].filter(start_date__lte = searchDate) & context['contexts'].filter(end_date__gte = searchDate).order_by('-start_date')
     return render(request, 'users/dashboard.html', context)
 
+def RemindersView(request):
+    if request.user.is_authenticated() == False:
+        return HttpResponseRedirect('/accounts/login/')
+    from .forms import RemindersForm
+    context = {}
+    context['reminders'] = Reminders.objects.filter(patient=request.user)
+    if request.method == 'POST' and request.user:
+    # create a form instance and populate it with data from the request:
+        form = RemindersForm(request.POST)
+        context['form'] = form
+        # check whether it's valid:
+        if form.is_valid():
+            userid = request.user
+            when = request.POST.get('when')
+            text = request.POST.get('text')
+            remind = Reminders(patient=userid, when=when, text=text)
+            remind.save()
+            return HttpResponseRedirect('/users/~reminders/')
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = RemindersForm()
+        context['form'] = form
+
+    return render(request, 'users/reminders.html', context)
+
 
 def HomeView(request):
     if request.user.is_authenticated() == False:
@@ -287,8 +312,9 @@ def sendUserMessage(message, user):
 
 @csrf_exempt
 def UserSchedule(request):
-    #user = User.objects.get(phone="2035601401")
-    #sendUserMessage(datetime.datetime.strftime(datetime.datetime.now(), "%c"), user)
+    #TO-DO - go through all the reminders and send any that were scheduled for anywhere in current day and hour (e.g. it's Monday 12:24 PM so send everything from Monday 12 PM to 12:59 PM)
+
+    #sendUserMessage(message, user)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
 #import schedule

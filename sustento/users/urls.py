@@ -50,5 +50,10 @@ urlpatterns = [
         regex=r'^~dashboard/$',
         view=views.DashboardView,
         name='dashboard'
-    )
+    ),
+    url(
+        regex=r'^~reminders/$',
+        view=views.RemindersView,
+        name='reminders'
+    ),
 ]

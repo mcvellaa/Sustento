@@ -53,6 +53,11 @@ class ContextForWeek(models.Model):
         from datetime import datetime
         return self.end_date.strftime('%b %m, %y')
 
+class Reminders(models.Model):
+    patient = models.ForeignKey(User)
+    when = models.DateTimeField()
+    text = models.CharField(max_length = 150)
+
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
     context = models.ForeignKey(ContextForWeek)

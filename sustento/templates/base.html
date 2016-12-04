@@ -31,7 +31,7 @@
     <div class="m-b-1">
       <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;">
         <div class="container">
-          <a class="navbar-brand" href="/">Sustento</a>
+          <a class="navbar-brand" href="{% url 'users:dashboard' %}">Sustento</a>
           <button type="button" class="navbar-toggler hidden-sm-up pull-xs-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             &#9776;
           </button>
@@ -55,6 +55,9 @@
 
             <ul class="nav navbar-nav pull-xs-right">
               {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'users:reminders' %}">{% trans "Reminders" %}</a>
+                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
                 </li>
