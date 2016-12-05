@@ -413,8 +413,9 @@ def sendUserMessage(message, user):
 @csrf_exempt
 def UserSchedule(request):
     #TO-DO - go through all the reminders and send any that were scheduled for anywhere in current day and hour (e.g. it's Monday 12:24 PM so send everything from Monday 12 PM to 12:59 PM)
-
-    #sendUserMessage(message, user)
+    for r in Reminders.objects.all():
+        if r.day_int == datetime.datetime.today().weekday():
+            sendUserMessage(r.text, r.patient)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
 #import schedule
