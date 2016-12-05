@@ -416,7 +416,7 @@ def UserSchedule(request):
     for r in Reminders.objects.all():
         print(r.day_int)
         if r.day_int == datetime.datetime.today().weekday():
-            print()"got to sending")
+            print("got to sending")
             sendUserMessage(r.text, r.patient)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
 
