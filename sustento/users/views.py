@@ -76,7 +76,7 @@ def MessagesView(request):
         messages[key]["type"] = "sent"
         messages[key]["date"] = s.date_created
         messages[key]["text"] = s.message
-    context['messages'] = messages
+    context['mes'] = messages
 
     return render(request, 'users/messages.html', context)
 
