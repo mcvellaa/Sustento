@@ -4,42 +4,29 @@
 
 {% block content %}
 
-<h1>Messages Sent To You</h1>
-  <br>
-  <table class="table-striped" cellpadding="10">
-    {% if sentMessages %}
-        <tr>
-            <th>Phone Number</th>
-            <th>Date and Time</th>
-            <th>Message</th>
-        </tr>
-        {% for s in sentMessages %}
-        <tr>
-            <td > {{ s.phone }} </td>
-            <td > {{ s.date_created }} </td>
-            <td > {{ s.message }} </td>
-        </tr>
-        {% endfor %}
-    {% endif %}
-  </table>
-  <br>
-  <h1>Messages Received From You</h1>
-  <br>
-  <table class="table-striped" cellpadding="10">
-    {% if responses %}
-        <tr>
-            <th>Phone Number</th>
-            <th>Date and Time</th>
-            <th>Message</th>
-        </tr>
-        {% for r in responses %}
-        <tr>
-            <td > {{ r.phone }} </td>
-            <td > {{ r.date_created }} </td>
-            <td > {{ r.message }} </td>
-        </tr>
-        {% endfor %}
-    {% endif %}
-  </table>
+<h1>All Messages</h1>
+<br>
+{% if mes %}
+    {% for key, value in mes.items %}
+        {% if value.type == "sent" %}
+            <div class="row">
+                <div class="col-sm-6" style="background-color: lightgray">
+                    <p>{{ value.date }}: {{ value.text }}</p>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-sm-6">
+                </div>
+                <div class="col-sm-6" style="background-color: lightblue">
+                    <p style="text-align:right">{{ value.date }}: {{ value.text }}</p>
+                </div>
+            </div>
+        {% endif %}
+        <br>
+    {% endfor %}
+{% endif %}
 
 {% endblock content %}
