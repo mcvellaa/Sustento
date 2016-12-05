@@ -9,15 +9,15 @@
   <table class="table-striped" cellpadding="10">
     {% if messages %}
         <tr>
-            <th>Phone Number</th>
+            <th>Key</th>
             <th>Date and Time</th>
             <th>Message</th>
         </tr>
-        {% for s in messages %}
+        {% for m in messages.keys() %}
         <tr>
-            <td > {{ s.phone }} </td>
-            <td > {{ s.date_created }} </td>
-            <td > {{ s.message }} </td>
+            <td > {{ m }} </td>
+            <td > {{ messages[m]["date"] }} </td>
+            <td > {{ messages[m]["text"] }} </td>
         </tr>
         {% endfor %}
     {% endif %}

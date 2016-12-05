@@ -62,7 +62,21 @@ def MessagesView(request):
     context = {}
     responses = Response.objects.all().filter(sender=request.user).order_by('-date_created')
     sentMessages = SentMessage.objects.all().filter(recipient=request.user).order_by('-date_created')
-    context['messages'] = responses | sentMessages
+    #now put all messages into a dictionary
+    messages = dict()
+    for r in responses:
+        key = "response" + str(r.id)
+        messages[key] = dict()
+        messages[key]["type"] = "responses"
+        messages[key]["date"] = r.date_created
+        messages[key]["text"] = r.message
+    for s in sentMessages:
+        key = "sent" + str(s.id)
+        messages[key] = dict()
+        messages[key]["type"] = "sent"
+        messages[key]["date"] = s.date_created
+        messages[key]["text"] = s.message
+    context['messages'] = messages
 
     return render(request, 'users/messages.html', context)
 
