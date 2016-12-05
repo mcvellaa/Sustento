@@ -15,6 +15,10 @@ class JournalEntryForm(forms.Form):
 class DateInput(forms.DateInput):
     input_type = 'datetime-local'
 
-class RemindersForm(forms.Form):
-    when = forms.DateField(label="Date and Time", id="datepicker")
-    text = forms.CharField(label='Text', max_length=150)
+class RemindersForm(forms.ModelForm):
+    class Meta:
+        model = Reminders
+        fields = ['when', 'text']
+        widgets = {
+            'when': DateInput(),
+        }
