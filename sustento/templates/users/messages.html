@@ -16,8 +16,8 @@
         {% for m in messages.keys %}
         <tr>
             <td > {{ m }} </td>
-            <td > {{ messages.m."date" }} </td>
-            <td > {{ messages.m."text" }} </td>
+            <td > {{ messages.m.date }} </td>
+            <td > {{ messages.m.text }} </td>
         </tr>
         {% endfor %}
     {% endif %}
