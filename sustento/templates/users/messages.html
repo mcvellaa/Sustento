@@ -9,14 +9,14 @@
   <table class="table-striped" cellpadding="10">
     {% if mes %}
         <tr>
-            <th>Key</th>
+            <th>Type</th>
             <th>Date and Time</th>
             <th>Message</th>
         </tr>
         {% for key, value in mes.items %}
         <tr>
-            <td > {{ key }} </td>
-            <td > {{ value }} </td>
+            <td > {{ value.type }} </td>
+            <td > {{ value.date }} </td>
             <td > {{ value.text }} </td>
         </tr>
         {% endfor %}
