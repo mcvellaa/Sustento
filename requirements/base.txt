@@ -8,6 +8,7 @@ schedule
 twilio==5.6.0
 whitenoise
 watson_developer_cloud
+django-datetime-widget
 
 # Bleeding edge Django
 django==1.10.2
