@@ -20,5 +20,5 @@ class RemindersForm(forms.ModelForm):
         model = Reminders
         fields = ['when', 'text']
         widgets = {
-            'when': DateInput(),
+            'when': DateField(label="Enter a date in the format MM/DD/YYYY", input_formats=['%m-%d-%Y']),
         }
