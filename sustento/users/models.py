@@ -65,7 +65,7 @@ class Reminders(models.Model):
         return days[self.when.weekday()]
 
     def day_int(self):
-        return self.when.weekday()
+        return Int(self.when.weekday())
 
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
