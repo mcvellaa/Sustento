@@ -1,7 +1,6 @@
 from django import forms
 import datetime
 from .models import Reminders
-from datetimewidget.widgets import DateTimeWidget
 
 class UserSendForm(forms.Form):
 #    def __init__(self, *args, **kwargs):
@@ -17,5 +16,5 @@ class DateInput(forms.DateInput):
     input_type = 'datetime-local'
 
 class RemindersForm(forms.Form):
-    when = DateTimeWidget(attrs={'id':"Day of Week and Time"}, bootstrap_version=3)
+    when = forms.DateTimeField(label="Date and Time")
     text = forms.CharField(label='Text', max_length=150)
