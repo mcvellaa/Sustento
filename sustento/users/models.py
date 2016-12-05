@@ -8,7 +8,8 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-
+import datetime
+from datetime import datetime
 
 @python_2_unicode_compatible
 class User(AbstractUser):
@@ -59,9 +60,12 @@ class Reminders(models.Model):
     text = models.CharField(max_length = 150)
 
     def day_of_week(self):
-        import datetime
-        return self.when.weekday()
+        days = dict()
+        days[0], days[1], days[2], days[3], days[4], days[5], days[6] = "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+        return days[self.when.weekday()]
 
+    def day_int(self):
+        return self.when.weekday()
 
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
@@ -75,7 +79,6 @@ class PersonalJournal(models.Model):
     emotion_joy = models.CharField(max_length=15, blank=True)
 
     def print_time(self):
-        from datetime import datetime
         return self.date_created.strftime('%m/%d/%y %H:%M')
 
     def get_dominant_mood(self):
