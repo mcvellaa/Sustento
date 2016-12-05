@@ -60,8 +60,9 @@ def MessagesView(request):
         return HttpResponseRedirect('/accounts/login/')
     #this is for viewing the raw messages thread
     context = {}
-    context['responses'] = Response.objects.all().filter(sender=request.user).order_by('-date_created')
-    context['sentMessages'] = SentMessage.objects.all().filter(recipient=request.user).order_by('-date_created')
+    responses = Response.objects.all().filter(sender=request.user).order_by('-date_created')
+    sentMessages = SentMessage.objects.all().filter(recipient=request.user).order_by('-date_created')
+    context['messages'] = responses | sentMessages
 
     return render(request, 'users/messages.html', context)
 

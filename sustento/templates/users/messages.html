@@ -4,16 +4,16 @@
 
 {% block content %}
 
-<h1>Messages Sent To You</h1>
+<h1>All Messages</h1>
   <br>
   <table class="table-striped" cellpadding="10">
-    {% if sentMessages %}
+    {% if messages %}
         <tr>
             <th>Phone Number</th>
             <th>Date and Time</th>
             <th>Message</th>
         </tr>
-        {% for s in sentMessages %}
+        {% for s in messages %}
         <tr>
             <td > {{ s.phone }} </td>
             <td > {{ s.date_created }} </td>
@@ -23,23 +23,5 @@
     {% endif %}
   </table>
   <br>
-  <h1>Messages Received From You</h1>
-  <br>
-  <table class="table-striped" cellpadding="10">
-    {% if responses %}
-        <tr>
-            <th>Phone Number</th>
-            <th>Date and Time</th>
-            <th>Message</th>
-        </tr>
-        {% for r in responses %}
-        <tr>
-            <td > {{ r.phone }} </td>
-            <td > {{ r.date_created }} </td>
-            <td > {{ r.message }} </td>
-        </tr>
-        {% endfor %}
-    {% endif %}
-  </table>
 
 {% endblock content %}
