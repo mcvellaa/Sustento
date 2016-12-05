@@ -5,6 +5,7 @@
 {% block content %}
 
 <h1>All Messages</h1>
+<br>
 {% if mes %}
     {% for key, value in mes.items %}
         {% if value.type == "sent" %}
@@ -19,7 +20,7 @@
             <div class="row">
                 <div class="col-sm-6">
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6" style="background-image: url('http://clipartsign.com/upload/2016/02/25/word-bubble-speech-bubble-page-page-frames-more-frames-more-frames-4-clip-art.png')">
                     <p style="text-align:right">{{ value.date }}: {{ value.text }}</p>
                 </div>
             </div>
