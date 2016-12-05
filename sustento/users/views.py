@@ -16,6 +16,7 @@ from twilio.rest import TwilioRestClient
 import os
 import re
 import datetime
+import collections
 
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
@@ -63,7 +64,7 @@ def MessagesView(request):
     responses = Response.objects.all().filter(sender=request.user).order_by('-date_created')
     sentMessages = SentMessage.objects.all().filter(recipient=request.user).order_by('-date_created')
     #now put all messages into a dictionary
-    messages = dict()
+    messages = collections.OrderedDict()
     for r in responses:
         key = "response" + str(r.id)
         messages[key] = dict()
