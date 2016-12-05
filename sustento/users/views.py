@@ -134,7 +134,7 @@ def DailySummaryView(request):
         stringDate = request.GET.get('searchStartDateBox', None)
         searchContext = request.GET.get('searchContextBox', None)
     # Default: Search Date is now()
-    if stringDate is None:
+    if stringDate is None or stringDate=='':
         searchStartDate=datetime.now().date()
         # FOR LOCAL TESTING: Search Date is set to 30th Nov
         searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
@@ -147,12 +147,15 @@ def DailySummaryView(request):
     currentDate = searchStartDate.strftime('%b %d, %y') 
 
     # 2. Get journal entries for user for a given day
+    # Filter Bar: Require only date or require both context and date
     if (searchContext != None and searchContext != '' and stringDate is not None):
         journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate).filter(context__context__icontains=searchContext)
+    # if (searchContext != None and searchContext != ''):
+    #     journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
     else:
         journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)   
     context = {}
-    
+
     # 3. Get Context & Data For Chart
     if len(journalEntries) < 1:
         con = None
