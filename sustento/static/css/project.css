@@ -40,9 +40,10 @@
 /* Background Color for Emotions on Dashboard */
 .bg-fear{
   color:#fff!important;
-  background-color:#EE82EE!important
+  background-color:#EE82EE!important;
 }
 .bg-joy{
   color:#2E2E2E!important;
-  background-color:#FFFF00!important
+  background-color:#FFFF00!important;
 }
+

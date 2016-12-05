@@ -56,4 +56,9 @@ urlpatterns = [
         view=views.RemindersView,
         name='reminders'
     ),
+        url(
+        regex=r'^~dailySummary/$',
+        view=views.DailySummaryView,
+        name='dailySummary'
+    )
 ]

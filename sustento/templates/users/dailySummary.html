@@ -1,0 +1,132 @@
+<!-- Dashboard:
+	 Filter Bar: Search by Day/ Week -> Date Picker
+	 Title Bar: Day of the week + Context for the Day
+	 Chart
+	 Journal Entry + Sentiment Analysis for each msg in that day
+
+	 Note: 
+	 If weekly instead of daily dashboard: use entries for whole week instead of just day
+-->
+
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Address Bar Title -->
+{% block title %}Daily Summary{% endblock %}
+
+{% block content %}
+<div class="container">
+	<!-- Filter Bar -->
+	<div class="row">
+		<form type='get' action='.' class='form-inline'>
+			<!-- Search Contexts -->
+			<div class='form-group col-md-4 col-sm-4 col-xs-4 col-lg-4'>
+				<input id='searchContextBox' type='text' name='searchContextBox' placeholder='Search Context ...' class='form-control'>
+			</div>
+			<!-- Specific Date: within a given range for Context -->
+			<!-- Start Date -->
+			<div class='form-group col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'>
+				<input id='searchStartDateBox' type='date' name='searchStartDateBox' class='form-control'>
+			</div>
+			<!-- Submit -->
+			<button id='searchSubmitBox' type='submit' class='btn col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'> Search </button>
+		</form>
+	</div>
+
+	<div class="row"><p></p></div>
+
+	<!-- Title -->
+	<div class="row bg-faded">
+		<span><h2 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> {{currentDay}} </h2></span>
+		<span class="col-md-8 col-sm-8 col-xs-8 col-lg-8">
+			<text>{{currentDate}}</text>
+			<h6> {{contextForWeek.context}} </h6>
+		</span>
+	</div>
+
+	<div class="row"><p></p></div>
+
+	<!-- Chart -->
+	<div class="row">
+		<div id="{{chartID|safe}}" class="chart col-md-12 col-sm-12 col-xs-12 col-lg-12"> </div>
+	</div>
+
+	<!-- Journal Entries + Emotion Analysis Results -->
+	<div class="row">
+		<div class='card'>
+			<!-- Heading: Context + Start/ End Dates -->
+			<div class='card-header'>
+				<div class='col-md-8 col-sm-8 col-xs-8 col-lg-8'>{{ c.context }}</div>
+				<div class='col-md-4 col-sm-8 col-xs-8 col-lg-8 text-xs-right text-sm-right text-md-right text-lg-right'>{{ c.print_start_date }} - {{ c.print_end_date }}</div>
+			</div>
+			<!-- Body: Personal Journal Entries For Given Context -->
+			<div class='card-block'>
+				{% for j in journalEntries %}
+					<!-- Background Color of Journal Entry Based on Dominant Mood -->
+					{% with dm=j.get_dominant_mood %}
+						{% if dm == "Anger" %}
+							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-danger'> 
+								{{j.print_time}} <br>
+								{{j.entry}} 
+							</p>
+						{% elif dm == "Disgust" %}
+							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-success'> 
+								{{j.print_time}} <br>
+								{{j.entry}} 
+							</p>
+						{% elif dm == "Sadness" %}
+							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-info'> 
+								{{j.print_time}} <br>
+								{{j.entry}} 
+							</p>
+						{% elif dm == "Fear" %}
+							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-fear'> 
+								{{j.print_time}} <br>
+								{{j.entry}} 
+							</p>
+						{% else %}
+							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-joy'> 
+								{{j.print_time}} <br>
+								{{j.entry}} 
+							</p>
+						{% endif %}
+					{% endwith %}
+				{% endfor %}
+			</div>
+			<!-- Footer: End of Week -->
+			<div class='card-footer'>
+			</div>
+		</div> <!-- End of Card Div -->
+	</div> <!-- End of Row Div -->
+
+</div>
+{% endblock content %}
+
+<!-- For Highcharts to work -->
+{% block js %}
+	{{ block.super }}
+	<!-- Load in jQuery and HighCharts -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+	<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+	<script>
+	    var chart_id = {{ chartID|safe }}
+	    var chart = {{ chart|safe }}
+	    var title = {{ title|safe }}
+	    var xAxis = {{ xAxis|safe }}
+	    var yAxis = {{ yAxis|safe }}
+	    var series = {{ series|safe }}
+	</script>
+	<!-- Highchart js. Variable map shown above -->
+	<script>
+		$(document).ready(function() {
+		    $(chart_id).highcharts({
+		        chart: chart,
+		        title: title,
+		        xAxis: xAxis,
+		        yAxis: yAxis,
+		        series: series
+		    });
+		});
+	</script>
+{% endblock %}
