@@ -129,30 +129,35 @@ def getChartData(journalEntries):
 # Daily Dashboard for User
 def DailySummaryView(request):
     from datetime import datetime
-    # 1. Get Search Date: If User enters date
+    # 1. Get Search Date & Search Context: If User enters date
     if request.method=='GET':
         stringDate = request.GET.get('searchStartDateBox', None)
+        searchContext = request.GET.get('searchContextBox', None)
     # Default: Search Date is now()
     if stringDate is None:
         searchStartDate=datetime.now().date()
-
-        # FOR TESTING: Search Date
+        # FOR LOCAL TESTING: Search Date is set to 30th Nov
         searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
     else:
+        # Get Date Object from String entered
         searchStartDate = datetime.strptime(stringDate, "%Y-%m-%d").date()
 
+    # Get Current Day/ Date 
     currentDay = searchStartDate.strftime('%A').upper()
-    currentDate = searchStartDate.strftime('%b %d, %y')
+    currentDate = searchStartDate.strftime('%b %d, %y') 
 
     # 2. Get journal entries for user for a given day
-    journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)
-    print("Journal ENtries: ", journalEntries)
+    if (searchContext != None and searchContext != '' and stringDate is not None):
+        journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate).filter(context__context__icontains=searchContext)
+    else:
+        journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)   
     context = {}
+    
+    # 3. Get Context & Data For Chart
     if len(journalEntries) < 1:
         con = None
     else:
         con = journalEntries[0].context
-        # 3. Get Data For Chart
         data = getChartData(journalEntries)
 
         # 4. Chart Attributes
