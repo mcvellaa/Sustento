@@ -60,7 +60,7 @@ class Reminders(models.Model):
 
     def day_of_week(self):
         import datetime
-        return datetime.datetime(self.when).weekday()
+        return self.when.weekday()
 
 
 class PersonalJournal(models.Model):
