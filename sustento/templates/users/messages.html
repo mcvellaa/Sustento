@@ -13,11 +13,11 @@
             <th>Date and Time</th>
             <th>Message</th>
         </tr>
-        {% for m in messages.keys %}
+        {% for key, value in messages.items %}
         <tr>
-            <td > {{ m }} </td>
-            <td > {{ messages.m.date }} </td>
-            <td > {{ messages.m.text }} </td>
+            <td > {{ key }} </td>
+            <td > {{ value }} </td>
+            <td > {{ value }} </td>
         </tr>
         {% endfor %}
     {% endif %}
