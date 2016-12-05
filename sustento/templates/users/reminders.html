@@ -21,12 +21,12 @@
     <h3> Reminders </h3>
       <table class="table-striped" cellpadding="10">
         <tr>
-            <th>Date and Time</th>
-            <th>Text</th>
+            <th>Day of Week</th>
+            <th>Text of Reminder</th>
         </tr>
         {% for r in reminders %}
             <tr>
-                <td> {{ r.when }} </td>
+                <td> {{ r.day_of_week }} </td>
                 <td> {{ r.text }} </td>
             </tr>
         {% endfor %}

@@ -58,6 +58,11 @@ class Reminders(models.Model):
     when = models.DateField()
     text = models.CharField(max_length = 150)
 
+    def day_of_week(self):
+        import datetime
+        return datetime.datetime(self.when).weekday()
+
+
 class PersonalJournal(models.Model):
     patient = models.ForeignKey(User)
     context = models.ForeignKey(ContextForWeek)
