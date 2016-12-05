@@ -5,23 +5,27 @@
 {% block content %}
 
 <h1>All Messages</h1>
-  <br>
-  <table class="table-striped" cellpadding="10">
-    {% if mes %}
-        <tr>
-            <th>Type</th>
-            <th>Date and Time</th>
-            <th>Message</th>
-        </tr>
-        {% for key, value in mes.items %}
-        <tr>
-            <td > {{ value.type }} </td>
-            <td > {{ value.date }} </td>
-            <td > {{ value.text }} </td>
-        </tr>
-        {% endfor %}
-    {% endif %}
-  </table>
-  <br>
+{% if mes %}
+    {% for key, value in mes.items %}
+        {% if value.type == "sent" %}
+            <div class="row">
+                <div class="col-sm-6">
+                    <p>{{ value.date }}: {{ value.text }}</p>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-sm-6">
+                </div>
+                <div class="col-sm-6">
+                    <p style="text-align:right">{{ value.date }}: {{ value.text }}</p>
+                </div>
+            </div>
+        {% endif %}
+        <br>
+    {% endfor %}
+{% endif %}
 
 {% endblock content %}
