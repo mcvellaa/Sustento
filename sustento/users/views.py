@@ -64,7 +64,7 @@ def MessagesView(request):
     responses = Response.objects.all().filter(sender=request.user).order_by('-date_created')
     sentMessages = SentMessage.objects.all().filter(recipient=request.user).order_by('-date_created')
     #now put all messages into a dictionary
-    messages = collections.OrderedDict()
+    messages = dict()
     for r in responses:
         key = "response" + str(r.id)
         messages[key] = dict()
@@ -77,7 +77,7 @@ def MessagesView(request):
         messages[key]["type"] = "sent"
         messages[key]["date"] = s.date_created
         messages[key]["text"] = s.message
-    context['mes'] = messages
+    context['mes'] = collections.OrderedDict(sorted(messages.items(), key=lambda t: t[1]["date"]))
 
     return render(request, 'users/messages.html', context)
 
