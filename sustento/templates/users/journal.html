@@ -18,32 +18,6 @@
         </form>
     </div>
 
-    {% if journal and contexts %}
-        {% for c in contexts %}
-        <h3> {{ c.context }}, {{ c.start_date }} to {{ c.end_date }} </h3>
-
-            <table class="table-striped" cellpadding="10">
-                <tr>
-                    <th>Message</th>
-                    <th>Date and Time</th>
-                    <th>Emotions</th>
-                </tr>
-                {% for j in journal %}
-                    {% if j.context == c %}
-                    <tr>
-                        <td > {{ j.entry }} </td>
-                        <td > {{ j.date_created }} </td>
-                        <td > Anger: {{ j.emotion_anger }}, Disgust: {{ j.emotion_disgust }}, Sadness: {{ j.emotion_sadness }}, Fear: {{ j.emotion_fear }}, Joy: {{ j.emotion_joy }} </td>
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-            </table>
-
-            <br>
-        {% endfor %}
-    {% endif %}
-
-
   <h1>Journal Entries</h1>
   <br>
   <table class="table-striped" cellpadding="10">

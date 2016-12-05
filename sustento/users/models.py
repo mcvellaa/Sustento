@@ -48,10 +48,10 @@ class ContextForWeek(models.Model):
 
     def print_start_date(self):
         from datetime import datetime
-        return self.start_date.strftime('%b %m, %y')
+        return self.start_date.strftime('%b %d, %y')
     def print_end_date(self):
         from datetime import datetime
-        return self.end_date.strftime('%b %m, %y')
+        return self.end_date.strftime('%b %d, %y')
 
 class Reminders(models.Model):
     patient = models.ForeignKey(User)

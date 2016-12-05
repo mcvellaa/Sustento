@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link href="https://www.highcharts.com/highslide/highslide.css" rel="stylesheet" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+        <script type="text/javascript" src="https://code.highcharts.com/highcharts-more.js"></script>
+        <script type="text/javascript" src="https://code.highcharts.com/modules/heatmap.js"></script>
+        <script type="text/javascript" src="https://code.highcharts.com/modules/exporting.js"></script>
+    </head>
+    <body style="margin:0;padding:0">
+                <div id="container" style="">Loading....</div>
+
+
+    <script>
+        $(function(){
+
+
+ 
+
+
+
+
+            Highcharts.setOptions({"lang": {}, "global": {}});
+            var option = {"title": {"text": "Daily Emotion Analysis"}, "navigation": {}, "tooltip": {"pointFormat": "{point.x} km: {point.y}\u00b0C", "headerFormat": "<b>{series.name}</b><br/>"}, "pane": {}, "series": {}, "exporting": {}, "credits": {"enabled": false}, "colors": {}, "subtitle": {}, "legend": {"enabled": false}, "xAxis": {"reversed": false, "labels": {"formatter": function () {                return this.value;            }}, "showLastLabel": true, "title": {"enabled": true, "text": "Time"}, "maxPadding": 0.05}, "loading": {}, "labels": {}, "drilldown": {}, "plotOptions": {}, "chart": {"renderTo": "container"}, "yAxis": {"lineWidth": 2, "labels": {"formatter": function () {                return this.value + '°';            }}, "title": {"text": "Emotion Score"}}};
+
+
+            var data = [{"marker": {"lineWidth": 1, "lineColor": Highcharts.getOptions().colors[0], "fillColor": "white"}, "tooltip": {"pointFormat": "Observation: {point.y}"}, "type": "scatter", "name": "Outlier", "data": [[1, 2], [0.5, 3]]}];
+            option.series = data;
+
+ 
+
+            var chart = new Highcharts.Chart(option);
+
+
+
+
+
+ 
+
+
+        
+    });
+        </script>
+
+    </body>
+</html>
