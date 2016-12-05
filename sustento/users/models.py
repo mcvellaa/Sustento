@@ -55,7 +55,7 @@ class ContextForWeek(models.Model):
 
 class Reminders(models.Model):
     patient = models.ForeignKey(User)
-    when = models.DateTimeField()
+    when = models.DateField()
     text = models.CharField(max_length = 150)
 
 class PersonalJournal(models.Model):

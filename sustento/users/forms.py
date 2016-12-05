@@ -16,5 +16,5 @@ class DateInput(forms.DateInput):
     input_type = 'datetime-local'
 
 class RemindersForm(forms.Form):
-    when = forms.DateTimeField(label="Date and Time")
+    when = forms.DateField(label="Date and Time", id="datepicker")
     text = forms.CharField(label='Text', max_length=150)
