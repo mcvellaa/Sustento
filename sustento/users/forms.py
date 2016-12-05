@@ -13,8 +13,12 @@ class JournalEntryForm(forms.Form):
     text = forms.CharField(label='Journal Entry', max_length=1998)
 
 class DateInput(forms.DateInput):
-    input_type = 'datetime-local'
+    input_type = 'date'
 
-class RemindersForm(forms.Form):
-    when = forms.DateField(label="Enter a date in the format MM/DD/YYYY", input_formats=['%m-%d-%Y'])
-    text = forms.CharField(label='Text', max_length=150)
+class RemindersForm(forms.ModelForm):
+    class Meta:
+        model = Reminders
+        fields = ['when', 'text']
+        widgets = {
+            'when': DateInput(),
+        }
