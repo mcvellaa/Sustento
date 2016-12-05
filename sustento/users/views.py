@@ -77,7 +77,7 @@ def MessagesView(request):
         messages[key]["type"] = "sent"
         messages[key]["date"] = s.date_created
         messages[key]["text"] = s.message
-    context['mes'] = collections.OrderedDict(sorted(messages.items(), key=lambda t: t[1]["date"]))
+    context['mes'] = collections.OrderedDict(sorted(messages.items(), key=lambda t: t[1]["date"], reverse=True))
 
     return render(request, 'users/messages.html', context)
 
