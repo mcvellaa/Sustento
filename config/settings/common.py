@@ -14,7 +14,7 @@ import environ
 import os
 
 ROOT_DIR = environ.Path(__file__) - 4  # (sustento/config/settings/common.py - 3 = sustento/)
-APPS_DIR = os.path.join(ROOT_DIR, 'sustento')
+APPS_DIR = environ.Path(__file__) - 3   # (sustento/config/settings/common.py - 3 = sustento/)
 
 env = environ.Env()
 
@@ -179,7 +179,7 @@ STATIC_URL = '/static/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
-    str(APP_DIR.path('static')),
+    str(APPS_DIR.path('sustento/static/')),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
