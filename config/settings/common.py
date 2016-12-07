@@ -12,8 +12,8 @@ from __future__ import absolute_import, unicode_literals
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (sustento/config/settings/common.py - 3 = sustento/)
-APPS_DIR = ROOT_DIR.path('sustento')
+ROOT_DIR = environ.Path(__file__) - 4  # (sustento/config/settings/common.py - 3 = sustento/)
+APPS_DIR = os.path.join(ROOT_DIR, 'sustento')
 
 env = environ.Env()
 
