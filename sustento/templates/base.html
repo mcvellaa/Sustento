@@ -15,12 +15,14 @@
 
     {% block css %}
     <!-- Latest compiled and minified Bootstrap 4 Alpha 4 CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">-->
 
     <!-- Your stuff: Third-party CSS libraries go here -->
     
     <!-- This file stores project-specific CSS -->
+    <link href="{% static 'css/new.css' %}" rel="stylesheet">
     <link href="{% static 'css/project.css' %}" rel="stylesheet">
+    <link href="{% static 'css/newcopy.css' %}" rel="stylesheet">
     
     {% endblock %}
 
@@ -28,8 +30,8 @@
 
   <body>
 
-    <div class="m-b-1">
-      <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;">
+    <div class="m-b-1" id="nvbar">
+      <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #FF7E79;">
         <div class="container">
           <a class="navbar-brand" href="{% url 'users:dashboard' %}">Sustento</a>
           <button type="button" class="navbar-toggler hidden-sm-up pull-xs-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
@@ -37,7 +39,7 @@
           </button>
 
           <!-- Collect the nav links, forms, and other content for toggling -->
-          <div class="collapse navbar-toggleable-xs" id="bs-navbar-collapse-1">
+          <div class="collapse navbar-toggleable-xs" id="bs-navbar-collapse-1 newid" >
             <ul class="nav navbar-nav">
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:home' %}">Home</a>

@@ -1,0 +1,29 @@
+body{
+background-image: url('../images/mainr.jpg');
+background-size: 100%;
+color: white;
+}
+
+#newid li{
+	text-align: center;
+	color: white;
+}
+.home {
+background-image: url('../images/main.jpg');
+background-size: 100%;
+text-align: center;
+color: black;
+font-family: Avenir;
+}
+
+.jumbotron {
+  background-color: #ffffff;
+  border: 3px #FF7E79;
+  opacity: 0.6;
+  filter: alpha(opacity=60); /* For IE8 and earlier */
+  color: black;
+}
+
+.card-header{
+	color: black;
+}
