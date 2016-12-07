@@ -64,7 +64,5 @@ sustento/media/
 local.py
 test.py
 
-staticfiles/
-
 sustento.db
 
