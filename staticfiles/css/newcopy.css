@@ -11,9 +11,9 @@ color: white;
 .home {
 background-image: url('../images/main.jpg');
 background-size: 100%;
-text-align: center;
+text-align: left;
 color: black;
-font-family: Avenir;
+font-family: Heiti SC;
 }
 
 .jumbotron {
@@ -22,8 +22,15 @@ font-family: Avenir;
   opacity: 0.6;
   filter: alpha(opacity=60); /* For IE8 and earlier */
   color: black;
+  font-family: Heiti SC;
 }
 
 .card-header{
 	color: black;
+	font-family: Heiti SC;
+}
+
+.row{
+	color: black;
+	font-family: Heiti SC;
 }
