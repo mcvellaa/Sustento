@@ -392,6 +392,10 @@ def storeUserMessage(resp, user):
         # Store Context for Week
         con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.datetime.now(), end_date=(datetime.datetime.now() + datetime.timedelta(days=7)))
         con.save()
+        # Store message as Personal Journal as well to display on dashboard
+        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
+        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=con, emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+        journalEntry.save()
         
     elif msgIntent == 'Unsubscribe':
         deactivateUser(user)
