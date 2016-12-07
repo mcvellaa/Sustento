@@ -13,8 +13,8 @@ from __future__ import absolute_import, unicode_literals
 import environ
 import os
 
-ROOT_DIR = environ.Path(__file__) - 4  # (sustento/config/settings/common.py - 3 = sustento/)
-APPS_DIR = environ.Path(__file__) - 3   # (sustento/config/settings/common.py - 3 = sustento/)
+ROOT_DIR = environ.Path(__file__) - 3  # (sustento/config/settings/common.py - 3 = sustento/)
+APPS_DIR = environ.Path(__file__) - 2   # (sustento/config/settings/common.py - 3 = sustento/)
 
 env = environ.Env()
 
@@ -179,7 +179,7 @@ STATIC_URL = '/static/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
-    str(APPS_DIR.path('sustento/static/')),
+    str(APPS_DIR.path('static/')),
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
