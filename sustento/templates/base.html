@@ -33,7 +33,7 @@
     <div class="m-b-1" id="nvbar">
       <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #FF7E79;">
         <div class="container">
-          <a class="navbar-brand" href="{% url 'users:dashboard' %}">Sustento</a>
+          <a class="navbar-brand" href="{% url 'users:main' %}">Sustento</a>
           <button type="button" class="navbar-toggler hidden-sm-up pull-xs-right" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
             &#9776;
           </button>
@@ -45,13 +45,13 @@
                 <a class="nav-link" href="{% url 'users:home' %}">Home</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:dashboard' %}">Dashboard</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:messages' %}">Messages</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:journal' %}">Journal</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'about' %}">About</a>
               </li>
             </ul>
 

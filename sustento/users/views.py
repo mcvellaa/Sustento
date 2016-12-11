@@ -81,6 +81,10 @@ def MessagesView(request):
 
     return render(request, 'users/messages.html', context)
 
+def MainView(request):
+    context = {}
+    return render(request, 'users/main.html', context)
+
 def JournalView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
