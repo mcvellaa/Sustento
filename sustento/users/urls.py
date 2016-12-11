@@ -12,7 +12,7 @@ urlpatterns = [
         name='main'
     ),
     url(
-        regex=r'^~home$',,
+        regex=r'^~home$',
         view=views.HomeView,
         name='home'
     ),
