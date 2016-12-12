@@ -274,7 +274,7 @@ def HomeView(request):
             message = tclient.messages.create(body=messageBody, to="+1"+phone_number, from_="+14122010448")
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~home')
-        elif email_form.is_vali():
+        elif email_form.is_valid():
             print("Sending email")
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
             
