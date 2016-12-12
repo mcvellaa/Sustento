@@ -86,6 +86,8 @@ def MessagesView(request):
     return render(request, 'users/messages.html', context)
 
 def MainView(request):
+    if request.user.is_authenticated() and request.user.phone == "":
+        return HttpResponseRedirect('/users/~update')
     context = {}
     return render(request, 'users/main.html', context)
 
@@ -250,14 +252,18 @@ def HomeView(request):
         return HttpResponseRedirect('/users/~update')
         
     from .forms import UserSendForm
+    from .forms import EmailSendForm
     context = {}
     # if this is a POST request we need to process the form data
     if request.method == 'POST' and request.user:
         # create a form instance and populate it with data from the request:
         form = UserSendForm(request.POST)
+        email_form = EmailSendForm(request.POST)
         context['form'] = form
+        context['email_form'] = email_form
         # check whether it's valid:
         if form.is_valid():
+            print("Sending text")
             # THIS IS WHERE I SEND TO TWILIO
             tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
             phone_number = request.user.phone
@@ -266,14 +272,23 @@ def HomeView(request):
             sentM = SentMessage(recipient=userid, phone=phone_number, message=messageBody)
             sentM.save()
             message = tclient.messages.create(body=messageBody, to="+1"+phone_number, from_="+14122010448")
-            # 
             # redirect to a new URL:
-            return HttpResponseRedirect('/users/')
+            return HttpResponseRedirect('/users/home')
+        elif email_form.is_vali():
+            print("Sending email")
+            #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
+            
+
+            print(request.POST.get('email'))
+
+            return HttpResponseRedirect('/users/home')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UserSendForm()
+        email_form = EmailSendForm()
         context['form'] = form
+        context['email_form'] = email_form
 
     return render(request, 'users/home.html', context)
 
