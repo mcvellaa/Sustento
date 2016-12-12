@@ -18,6 +18,10 @@ import re
 import datetime
 import collections
 
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from anymail.message import attach_inline_image_file
+
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -338,6 +342,13 @@ def getResponseForMessage(msg, user):
     else:
         automatedResp = 'Got it, have a great rest of your day!'
     return automatedResp
+
+def makeEmergencyCall(user):
+    tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+    phone_number = user.phone
+    call = client.calls.create(to="+1" + phone_number,
+                           from_="+12035601401", # will be campus police, but mark's phone number for now
+                           url="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient")
 
 @csrf_exempt
 def getContextForWeek(entities):
