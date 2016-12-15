@@ -26,16 +26,6 @@ class User(AbstractUser):
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})
 
-    def save(self, *args, **kwargs):
-        super(...).save(*args, **kwargs)
-        if self._state.adding:
-            remind1 = Reminders(patient=self.id, when=datetime.now(), text="What do you want to work on this week?")
-            remind1.save()
-            remind2 = Reminders(patient=self.id, when=(datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
-            remind2.save()
-            remind3 = Reminders(patient=self.id, when=(datetime.now() + datetime.timedelta(days=4)), text="How full is your hope tank? What do you want to better understand?")
-            remind3.save()
-
 class Response(models.Model):
     sender = models.ForeignKey(User)
     phone = models.CharField(max_length=15)
