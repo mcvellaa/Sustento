@@ -452,9 +452,12 @@ def deactivateUser(user):
 # SCHEDULE TEXT MESSAGES
 def sendUserMessage(message, user):
     # send the text to the user through Twilio
-    tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
-    phone_number = user.phone
-    message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
+    if user.phone:
+        tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+        phone_number = user.phone
+        message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
+    else:
+        print("Tried to send reminder, but user id: %d does not have phone number" % user.id)
 
 @csrf_exempt
 def UserSchedule(request):

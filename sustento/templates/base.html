@@ -98,7 +98,7 @@
       <br>
       <footer>
         {% if request.user.is_authenticated and request.user.is_superuser %}
-            <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">{% trans "Admin Panel" %}</a>    <a class="btn btn-outline-secondary" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
+            <a class="btn btn-outline-secondary" href="{% url 'admin:users' %}">{% trans "Admin Panel" %}</a>    <a class="btn btn-outline-secondary" href="{% url 'users:list' %}">{% trans "Users List" %}</a>
         {% endif %}
       </footer>
       <br>
