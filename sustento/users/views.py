@@ -107,9 +107,8 @@ def JournalView(request):
             # Get the emotions back
             userid = request.user
             messageBody = request.POST.get('text')
-            sentimentAnalysis = alchemy_language.emotion(text=messageBody)
-            journalEntry = PersonalJournal(patient=userid, entry=messageBody, context=ContextForWeek.objects.filter(patient=userid).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-            journalEntry.save()
+            # Get Intent and decide if personal journal/ high risk/ context
+            getResponseForMessage(messageBody, userid)
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~journal/')
     # if a GET (or any other method) we'll create a blank form
@@ -396,15 +395,19 @@ def getIntentOfMsg(intents):
         return ''
 
 @csrf_exempt
+def storePersonalJournal(resp, user):
+    sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
+    journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=ContextForWeek.objects.filter(patient=user).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+    journalEntry.save()
+
+@csrf_exempt
 def storeUserMessage(resp, user):
     msgIntent = getIntentOfMsg(resp['intents'])
     # If Personal Journal:
         # 1. Perform analysis
         # 2. Store sentiment analysis results
     if msgIntent == 'PersonalJournal':
-        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=ContextForWeek.objects.filter(patient=user).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-        journalEntry.save()
+        storePersonalJournal(resp, user)
         return
     # If Context For Week: Store Context For Week
     elif msgIntent == 'ContextForWeek':
@@ -423,12 +426,21 @@ def storeUserMessage(resp, user):
         con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.datetime.now(), end_date=(datetime.datetime.now() + datetime.timedelta(days=7)))
         con.save()
         # Store message as Personal Journal as well to display on dashboard
-        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=con, emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-        journalEntry.save()
+        storePersonalJournal(resp, user)
         
     elif msgIntent == 'Unsubscribe':
+        # Deactivate User
         deactivateUser(user)
+    elif msgIntent == 'HighRisk':
+        # 1. Store number of high risks for user
+        highRiskLog = HighRiskLog(patient = user, context=ContextForWeek.objects.filter(patient=user).latest('end_date'), msg=resp['input']['text']) 
+        highRiskLog.save()
+        # 2. Also store as personal journal
+        storePersonalJournal(resp, user)
+        # 3. If >= 3 per day --> makeEmergencyCall
+        highRiskCountPerDay = HighRiskLog.getHighRiskCountForDay(user.id)
+        if highRiskCountPerDay > 2:
+            makeEmergencyCall(user)
     else:
         return
 
