@@ -16,12 +16,16 @@
 
 {% block content %}
 <div class="container">
+	<!-- Explanation Alert -->
+	<div class="row alert alert-success" role="alert">
+		Note: Search by context for analysis by context or date for end of day summary.
+	</div>
 	<!-- Filter Bar -->
 	<div class="row">
 		<form type='get' action='.' class='form-inline'>
 			<!-- Search Contexts -->
 			<div class='form-group col-md-4 col-sm-4 col-xs-4 col-lg-4'>
-				<input id='searchContextBox' type='text' name='searchContextBox' placeholder='Search Latest Context ...' class='form-control'>
+				<input id='searchContextBox' type='text' name='searchContextBox' placeholder='Search Context ...' class='form-control'>
 			</div>
 			<!-- Specific Date: within a given range for Context -->
 			<!-- Start Date -->
@@ -29,7 +33,7 @@
 				<input id='searchStartDateBox' type='date' name='searchStartDateBox' class='form-control'>
 			</div>
 			<!-- Submit -->
-			<button id='searchSubmitBox' type='submit' class='btn col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'> Search </button>
+			<button id='searchSubmitBox' type='submit' class='btn bg-info col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'> Search </button>
 		</form>
 	</div>
 

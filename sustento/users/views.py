@@ -191,9 +191,9 @@ def getSearchDateFromFilterBar(request):
         stringDate = request.GET.get('searchStartDateBox', None)
     # Default: Search Date is now()
     if stringDate is None or stringDate=='':
-        # searchStartDate=datetime.now().date()
+        searchStartDate=datetime.now().date()
         # FOR LOCAL TESTING: Search Date is set to 30th Nov
-        searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
+        # searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
     else:
         # Get Date Object from String entered
         searchStartDate = datetime.strptime(stringDate, "%Y-%m-%d").date()
