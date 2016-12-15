@@ -18,6 +18,7 @@ class User(AbstractUser):
     name = models.CharField(_('Name of User'), blank=True, max_length=255)
     phone = models.CharField(_('Phone Number'), blank=False, max_length=255)
     text_active = models.BooleanField(default=True)
+    show_emotions = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username
