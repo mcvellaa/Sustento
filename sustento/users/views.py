@@ -157,72 +157,124 @@ def getChartData(journalEntries):
         data["Disgust"].append(float(j.emotion_disgust))
     return data
 
-# Daily Dashboard for User
-def DailySummaryView(request):
+def setChartContext(data):
+    # Set Chart Attributes
+    chartID = "lineChart"
+    chart = {"renderTo": chartID, "type": 'line'}  
+    # title = {"text": 'Daily Emotion Analysis'}
+    title = {"text": ''}
+    xAxis = {"title": {"text": 'Time'}, "categories": data['Time']}
+    yAxis = {"title": {"text": 'Emotion'}}
+    series = [
+        {"name": 'Anger', "data": data['Anger'], "color":'#d9534f'},
+        {"name": 'Sadness', "data": data['Sadness'], "color":'#5bc0de'},
+        {"name": 'Disgust', "data": data['Disgust'], "color":'#5cb85c'},
+        {"name": 'Joy', "data": data['Joy'], "color":'#ffd600'},
+        {"name": 'Fear', "data": data['Fear'], "color":'#EE82EE'}
+    ]
+
+    # Create Context Variables
+    context = {}
+    context['chartID'] = chartID
+    context['chart'] = chart
+    context['title'] = title
+    context['xAxis'] = xAxis
+    context['yAxis'] = yAxis
+    context['series'] = series
+
+    return context
+
+def getSearchDateFromFilterBar(request):
     from datetime import datetime
-    # 1. Get Search Date & Search Context: If User enters date
+    # 1. Get Search Date: If User enters date
     if request.method=='GET':
         stringDate = request.GET.get('searchStartDateBox', None)
-        searchContext = request.GET.get('searchContextBox', None)
     # Default: Search Date is now()
     if stringDate is None or stringDate=='':
-        searchStartDate=datetime.now().date()
+        # searchStartDate=datetime.now().date()
         # FOR LOCAL TESTING: Search Date is set to 30th Nov
-        # searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
+        searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
     else:
         # Get Date Object from String entered
         searchStartDate = datetime.strptime(stringDate, "%Y-%m-%d").date()
+    return searchStartDate
 
+def getSearchContextFromFilterBar(request):
+    searchContext = request.GET.get('searchContextBox', None)
+    return searchContext
+
+def getDictFromQuery(journalEntries):
+    journalEntriesByContextDict = dict()
+    for je in journalEntries:
+        if je.context in journalEntriesByContextDict:
+            journalEntriesByContextDict[je.context].append(je)
+        else:
+            journalEntriesByContextDict[je.context] = [je]
+    return journalEntriesByContextDict
+
+# DEAFULT View: Daily Dashboard for User
+def DailySummaryView(request):
+    from datetime import datetime
+    # 1. Get Search Date & Search Context: If User enters date
+    searchContext = getSearchContextFromFilterBar(request)
+    # If Context Specified: Render Chart Based on Context
+    if (searchContext != '' and searchContext!=None):
+        return ContextSummaryView(request)
+    # Else: Render Chart Based on Date
+    searchStartDate = getSearchDateFromFilterBar(request)
     # Get Current Day/ Date 
     currentDay = searchStartDate.strftime('%A').upper()
     currentDate = searchStartDate.strftime('%b %d, %y') 
-
-    # 2. Get journal entries for user for a given day
-    # Filter Bar: Require only date or require both context and date
-    if (searchContext != None and searchContext != '' and stringDate is not None):
-        journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate).filter(context__context__icontains=searchContext)
-    # if (searchContext != None and searchContext != ''):
-    #     journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
-    else:
-        journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)   
+    # 2. Get journal entries for user for a given day grouped by context
+    journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)
+    journalEntriesByContextDict = getDictFromQuery(journalEntries)
     context = {}
 
     # 3. Get Context & Data For Chart
     if len(journalEntries) < 1:
         con = None
     else:
-        con = journalEntries[0].context
+        # con = journalEntries[0].context
+        con = None
         data = getChartData(journalEntries)
+        # 4. Chart Attributes & Set Chart Context
+        context = setChartContext(data)
 
-        # 4. Chart Attributes
-        chartID = "lineChart"
-        chart = {"renderTo": chartID, "type": 'line'}  
-        # title = {"text": 'Daily Emotion Analysis'}
-        title = {"text": ''}
-        xAxis = {"title": {"text": 'Time'}, "categories": data['Time']}
-        yAxis = {"title": {"text": 'Emotion'}}
-        series = [
-            {"name": 'Anger', "data": data['Anger'], "color":'#d9534f'},
-            {"name": 'Sadness', "data": data['Sadness'], "color":'#5bc0de'},
-            {"name": 'Disgust', "data": data['Disgust'], "color":'#5cb85c'},
-            {"name": 'Joy', "data": data['Joy'], "color":'#ffd600'},
-            {"name": 'Fear', "data": data['Fear'], "color":'#EE82EE'}
-        ]
-
-        # 5. Create Context Variables
-        context['chartID'] = chartID
-        context['chart'] = chart
-        context['title'] = title
-        context['xAxis'] = xAxis
-        context['yAxis'] = yAxis
-        context['series'] = series
-
-    context['journalEntries'] = journalEntries
+    # Set Additional Chart Variables
+    context['journalEntries'] = journalEntriesByContextDict
+    context['journalEntriesExists'] = True if journalEntries.count()>1 else False
     context["contextForWeek"] = con
     context['currentDay'] = currentDay
     context['currentDate'] = currentDate
     # 6. Render Daily Summary Template
     return render(request, 'users/dailySummary.html', context)
+
+# Chart View if User specifies context
+def ContextSummaryView(request):
+    # 1. Get Reqd Context
+    searchContext = getSearchContextFromFilterBar(request)
+    # If None: set to current context for user
+    if (searchContext == None or searchContext == ''):
+        searchContext = ContextForWeek.objects.filter(patient=request.user).latest('end_date')
+    # 2. Get Journal Entries for Context
+    journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
+    journalEntriesByContextDict = getDictFromQuery(journalEntries)
+    # 3. Get Context & Data For Chart
+    context = {}
+    con = searchContext
+    if len(journalEntries) < 1:
+        con = None
+    else:
+        con = searchContext.title() # titlecase context
+        data = getChartData(journalEntries)
+        context = setChartContext(data)
+    # Set Additional Chart Variables
+    context['journalEntries'] = journalEntriesByContextDict
+    context['journalEntriesExists'] = True if journalEntries.count()>1 else False
+    context["contextForWeek"] = con
+    # 4. Render Context Summary
+    return render(request, 'users/dailySummary.html', context)
+
 
 def RemindersView(request):
     if request.user.is_authenticated() == False:
