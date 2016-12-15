@@ -16,6 +16,32 @@ color: black;
 font-family: Heiti SC;
 }
 
+.homepage {
+background-image: url('../images/main.jpg');
+background-size: 100%;
+text-align: center;
+
+}
+
+h11{
+text-align: center !important;
+font-size: 45pt;
+font-family: Heiti SC;
+}
+
+h12{
+
+font-size: 33pt;
+font-family: Heiti SC;
+text-align: center;
+}
+
+h13{
+text-align: center;
+font-size: 30pt;
+font-family: Zapfino;
+}
+
 .jumbotron {
   background-color: #ffffff;
   border: 3px #FF7E79;
