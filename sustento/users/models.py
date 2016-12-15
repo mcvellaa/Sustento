@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-import datetime
 from datetime import datetime
 
 @python_2_unicode_compatible
@@ -19,6 +18,7 @@ class User(AbstractUser):
     name = models.CharField(_('Name of User'), blank=True, max_length=255)
     phone = models.CharField(_('Phone Number'), blank=False, max_length=255)
     text_active = models.BooleanField(default=True)
+    show_emotions = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username
@@ -97,6 +97,17 @@ class PersonalJournal(models.Model):
             dominant_emotion = 'Joy'
         print('Emotion: ', dominant_emotion)
         return dominant_emotion
+
+class HighRiskLog(models.Model):
+    patient = models.ForeignKey(User)
+    context = models.ForeignKey(ContextForWeek)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    msg = models.CharField(max_length=2000)
+
+    def getHighRiskCountForDay(userid, searchDate = datetime.now().date()):
+        highRiskCountPerDay = HighRiskLog.objects.filter(patient = userid).filter(date_created__year=searchDate.year, date_created__month=searchDate.month, date_created__day=searchDate.day).count()
+        return highRiskCountPerDay
+
 
 
 

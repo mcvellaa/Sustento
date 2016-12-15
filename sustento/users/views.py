@@ -18,6 +18,10 @@ import re
 import datetime
 import collections
 
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from anymail.message import attach_inline_image_file
+
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -82,6 +86,14 @@ def MessagesView(request):
     return render(request, 'users/messages.html', context)
 
 def MainView(request):
+    if request.user.is_authenticated() and request.user.phone == "":
+        remind1 = Reminders(patient=request.user.id, when=datetime.now(), text="What do you want to work on this week?")
+        remind1.save()
+        remind2 = Reminders(patient=request.user.id, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
+        remind2.save()
+        remind3 = Reminders(patient=request.user.id, when=(datetime.datetime.now() + datetime.timedelta(days=4)), text="How full is your hope tank? What do you want to better understand?")
+        remind3.save()
+        return HttpResponseRedirect('/users/~update')
     context = {}
     return render(request, 'users/main.html', context)
 
@@ -101,9 +113,8 @@ def JournalView(request):
             # Get the emotions back
             userid = request.user
             messageBody = request.POST.get('text')
-            sentimentAnalysis = alchemy_language.emotion(text=messageBody)
-            journalEntry = PersonalJournal(patient=userid, entry=messageBody, context=ContextForWeek.objects.filter(patient=userid).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-            journalEntry.save()
+            # Get Intent and decide if personal journal/ high risk/ context
+            getResponseForMessage(messageBody, userid)
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~journal/')
     # if a GET (or any other method) we'll create a blank form
@@ -246,14 +257,18 @@ def HomeView(request):
         return HttpResponseRedirect('/users/~update')
         
     from .forms import UserSendForm
+    from .forms import EmailSendForm
     context = {}
     # if this is a POST request we need to process the form data
     if request.method == 'POST' and request.user:
         # create a form instance and populate it with data from the request:
         form = UserSendForm(request.POST)
+        email_form = EmailSendForm(request.POST)
         context['form'] = form
+        context['email_form'] = email_form
         # check whether it's valid:
         if form.is_valid():
+            print("Sending text")
             # THIS IS WHERE I SEND TO TWILIO
             tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
             phone_number = request.user.phone
@@ -262,14 +277,23 @@ def HomeView(request):
             sentM = SentMessage(recipient=userid, phone=phone_number, message=messageBody)
             sentM.save()
             message = tclient.messages.create(body=messageBody, to="+1"+phone_number, from_="+14122010448")
-            # 
             # redirect to a new URL:
-            return HttpResponseRedirect('/users/')
+            return HttpResponseRedirect('/users/~home')
+        elif email_form.is_valid():
+            print("Sending email")
+            #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
+            
+
+            print(request.POST.get('email'))
+
+            return HttpResponseRedirect('/users/~home')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UserSendForm()
+        email_form = EmailSendForm()
         context['form'] = form
+        context['email_form'] = email_form
 
     return render(request, 'users/home.html', context)
 
@@ -339,6 +363,13 @@ def getResponseForMessage(msg, user):
         automatedResp = 'Got it, have a great rest of your day!'
     return automatedResp
 
+def makeEmergencyCall(user):
+    tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+    phone_number = user.phone
+    call = client.calls.create(to="+1" + phone_number,
+                           from_="+12035601401", # will be campus police, but mark's phone number for now
+                           url="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient")
+
 @csrf_exempt
 def getContextForWeek(entities):
     # Entities is a list of dictionaries of different entities identified by Watson Conversation. We want value of entity titled ContextForWeek.
@@ -370,15 +401,19 @@ def getIntentOfMsg(intents):
         return ''
 
 @csrf_exempt
+def storePersonalJournal(resp, user):
+    sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
+    journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=ContextForWeek.objects.filter(patient=user).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
+    journalEntry.save()
+
+@csrf_exempt
 def storeUserMessage(resp, user):
     msgIntent = getIntentOfMsg(resp['intents'])
     # If Personal Journal:
         # 1. Perform analysis
         # 2. Store sentiment analysis results
     if msgIntent == 'PersonalJournal':
-        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=ContextForWeek.objects.filter(patient=user).latest('end_date'), emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-        journalEntry.save()
+        storePersonalJournal(resp, user)
         return
     # If Context For Week: Store Context For Week
     elif msgIntent == 'ContextForWeek':
@@ -397,12 +432,21 @@ def storeUserMessage(resp, user):
         con = ContextForWeek(patient=user, context=conForWeek, start_date=datetime.datetime.now(), end_date=(datetime.datetime.now() + datetime.timedelta(days=7)))
         con.save()
         # Store message as Personal Journal as well to display on dashboard
-        sentimentAnalysis = alchemy_language.emotion(text=resp['input']['text'])
-        journalEntry = PersonalJournal(patient=user, entry=resp['input']['text'], context=con, emotion_anger=sentimentAnalysis['docEmotions']['anger'], emotion_disgust=sentimentAnalysis['docEmotions']['disgust'], emotion_sadness=sentimentAnalysis['docEmotions']['sadness'], emotion_fear=sentimentAnalysis['docEmotions']['fear'], emotion_joy=sentimentAnalysis['docEmotions']['joy'])
-        journalEntry.save()
+        storePersonalJournal(resp, user)
         
     elif msgIntent == 'Unsubscribe':
+        # Deactivate User
         deactivateUser(user)
+    elif msgIntent == 'HighRisk':
+        # 1. Store number of high risks for user
+        highRiskLog = HighRiskLog(patient = user, context=ContextForWeek.objects.filter(patient=user).latest('end_date'), msg=resp['input']['text']) 
+        highRiskLog.save()
+        # 2. Also store as personal journal
+        storePersonalJournal(resp, user)
+        # 3. If >= 3 per day --> makeEmergencyCall
+        highRiskCountPerDay = HighRiskLog.getHighRiskCountForDay(user.id)
+        if highRiskCountPerDay > 2:
+            makeEmergencyCall(user)
     else:
         return
 
@@ -414,9 +458,12 @@ def deactivateUser(user):
 # SCHEDULE TEXT MESSAGES
 def sendUserMessage(message, user):
     # send the text to the user through Twilio
-    tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
-    phone_number = user.phone
-    message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
+    if user.phone:
+        tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+        phone_number = user.phone
+        message = tclient.messages.create(body=message, to="+1"+phone_number, from_="+14122010448")
+    else:
+        print("Tried to send reminder, but user id: %d does not have phone number" % user.id)
 
 @csrf_exempt
 def UserSchedule(request):

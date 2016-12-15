@@ -48,6 +48,21 @@
       </div>
       <br>
     </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <h3>Send Weekly Summary to Counselor</h3>
+        <p>Enter your counselor's email address below and click "Send Summary" to deliver a summary of your jounral and mood for the week.</p>
+        <form class="form-horizontal" method="post" action="{% url 'users:home' %}">
+          {% csrf_token %}
+          {{ email_form|crispy }}
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-outline-success">Send Summary</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
     
   {% else %}
     <h1>Please sign in to see this page</h1>
