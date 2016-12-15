@@ -371,9 +371,8 @@ def getResponseForMessage(msg, user):
 
 def makeEmergencyCall(user):
     tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
-    phone_number = user.phone
-    call = client.calls.create(to="+1" + phone_number,
-                           from_="+12035601401", # will be campus police, but mark's phone number for now
+    call = client.calls.create(to="+12035601401",
+                           from_="+14122010448", # will be campus police, but mark's phone number for now
                            url="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient")
 
 @csrf_exempt
@@ -474,6 +473,9 @@ def sendUserMessage(message, user):
 @csrf_exempt
 def UserSchedule(request):
     for r in Reminders.objects.all():
+        if ((datetime.datetime.now() - Response.objects.filter(sender=r.patient.id).last().date_created) > datetime.timedelta(6)):
+            #makeEmergencyCall(User.objects.get(id=r.patient))
+            sendUserMessage("You haven't responded in 6 days or more!", r.patient)
         if r.when.weekday() == datetime.datetime.today().weekday():
             sendUserMessage(r.text, r.patient)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')
