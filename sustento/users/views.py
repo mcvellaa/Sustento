@@ -358,6 +358,7 @@ def HomeView(request):
             context['journalEntries'] = journalEntriesByContextDict
             context['journalEntriesExists'] = True if journalEntries.count()>1 else False
             context["contextForWeek"] = con
+            print(con)
             today = datetime.now().date().strftime("%Y-%m-%d")
             patientName = request.user.name
             msg = EmailMultiAlternatives(
