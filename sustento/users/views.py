@@ -193,10 +193,10 @@ def getSearchDateFromFilterBar(request):
     if stringDate is None or stringDate=='':
         searchStartDate=datetime.datetime.now().date()
         # FOR LOCAL TESTING: Search Date is set to 30th Nov
-        # searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
+        # searchStartDate = datetime.datetime.strptime('20161130', "%Y%m%d").date()
     else:
         # Get Date Object from String entered
-        searchStartDate = datetime.strptime(stringDate, "%Y-%m-%d").date()
+        searchStartDate = datetime.datetime.strptime(stringDate, "%Y-%m-%d").date()
     return searchStartDate
 
 def getSearchContextFromFilterBar(request):
