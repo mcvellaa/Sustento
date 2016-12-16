@@ -20,7 +20,9 @@ import collections
 
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
-from anymail.message import attach_inline_image_file
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string, get_template
+
 
 from datetime import datetime
 #------------------------------------------------------
@@ -274,36 +276,8 @@ def ContextSummaryView(request):
     context['journalEntriesExists'] = True if journalEntries.count()>1 else False
     context["contextForWeek"] = con
     # 4. Render Context Summary
-    return render(request, 'users/dailySummary.html', context)
-
-def EmailSummaryView(request, context):
-
-    from django.core.mail import EmailMessage
-    from django.template.loader import render_to_string, get_template
-
-    # Email attribues
-    today = datetime.now().date().strftime("%Y-%m-%d")
-    patientName = request.user.name
-    subject = today + ": Summary For " + patientName
-    from_email = 'ggury12345@gmail.com'
-    to_email = ['gauryn@andrew.cmu.edu', request.user.email]
-    # text_msg = 'Attached is daily summary chart and journal entries.'
-    # html_msg = render(request, 'users/dailySummary.html', context)
-
-    hMsg = get_template('users/dailySummary.html').render(context)
-    eMsg = EmailMessage(subject, hMsg, to=to_email, from_email=from_email)
-    eMsg.content_subtype = 'html'
-    eMsg.send()
-
-    # Send Email
-    # send_mail( 
-    #     subject=subject,
-    #     message = text_msg,
-    #     from_email = from_email,
-    #     recipient_list = to_email,
-    #     fail_silently=False,
-    #     html_message = html_msg
-    # )
+    return render(request, 'users/dailySummary.html', context)    
+    
 
 def RemindersView(request):
     if request.user.is_authenticated() == False:
@@ -368,17 +342,32 @@ def HomeView(request):
             return HttpResponseRedirect('/users/~home')
         elif email_form.is_valid():
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
+            searchContext = ContextForWeek.objects.filter(patient=request.user).latest('end_date')
+            journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
+            journalEntriesByContextDict = getDictFromQuery(journalEntries)
+            # 3. Get Context & Data For Chart
+            context = {}
+            con = searchContext
+            if len(journalEntries) < 1:
+                con = None
+            else:
+                con = searchContext.title() # titlecase context
+                data = getChartData(journalEntries)
+                context = setChartContext(data)
+            # Set Additional Chart Variables
+            context['journalEntries'] = journalEntriesByContextDict
+            context['journalEntriesExists'] = True if journalEntries.count()>1 else False
+            context["contextForWeek"] = con
+            today = datetime.now().date().strftime("%Y-%m-%d")
+            patientName = request.user.name
             msg = EmailMultiAlternatives(
-                subject="Weekly Counselor Summary From: " + request.user.name,
+                subject=today + ": Weekly Counselor Summary From: " + patientName,
                 body="Here is the weekly summary update for you.",
                 from_email="postmaster@sustentocmu.com",
                 to=[request.POST.get('email')],
                 reply_to=[request.user.email])
-
-            html = """
-            
-            """
-            msg.attach_alternative(html, "text/html")
+            hMsg = get_template('users/dailySummary.html').render(context)
+            msg.attach_alternative(hMsg, "text/html")
 
             # Send it:
             msg.send()
