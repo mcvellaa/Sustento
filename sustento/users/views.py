@@ -258,7 +258,7 @@ def ContextSummaryView(request):
     searchContext = getSearchContextFromFilterBar(request)
     # If None: set to current context for user
     if (searchContext == None or searchContext == ''):
-        searchContext = ContextForWeek.objects.filter(patient=request.user).latest('end_date')
+        searchContext = ContextForWeek.objects.filter(patient=request.user).latest('end_date').context
     # 2. Get Journal Entries for Context
     journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
     journalEntriesByContextDict = getDictFromQuery(journalEntries)
@@ -342,7 +342,7 @@ def HomeView(request):
             return HttpResponseRedirect('/users/~home')
         elif email_form.is_valid():
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
-            searchContext = ContextForWeek.objects.filter(patient=request.user.id).latest('end_date')
+            searchContext = ContextForWeek.objects.filter(patient=request.user.id).latest('end_date').context
             print(searchContext)
             journalEntries = PersonalJournal.objects.all().filter(patient=request.user.id).filter(context__context__icontains=searchContext)
             journalEntriesByContextDict = getDictFromQuery(journalEntries)
