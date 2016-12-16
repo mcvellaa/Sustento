@@ -22,6 +22,7 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from anymail.message import attach_inline_image_file
 
+from datetime import datetime
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -185,7 +186,6 @@ def setChartContext(data):
     return context
 
 def getSearchDateFromFilterBar(request):
-    from datetime import datetime
     # 1. Get Search Date: If User enters date
     if request.method=='GET':
         stringDate = request.GET.get('searchStartDateBox', None)
@@ -246,6 +246,10 @@ def DailySummaryView(request):
     context["contextForWeek"] = con
     context['currentDay'] = currentDay
     context['currentDate'] = currentDate
+
+    # Send Email
+    EmailSummaryView(request, context)
+
     # 6. Render Daily Summary Template
     return render(request, 'users/dailySummary.html', context)
 
@@ -275,6 +279,34 @@ def ContextSummaryView(request):
     # 4. Render Context Summary
     return render(request, 'users/dailySummary.html', context)
 
+def EmailSummaryView(request, context):
+
+    from django.core.mail import EmailMessage
+    from django.template.loader import render_to_string, get_template
+
+    # Email attribues
+    today = datetime.now().date().strftime("%Y-%m-%d")
+    patientName = request.user.name
+    subject = today + ": Summary For " + patientName
+    from_email = 'ggury12345@gmail.com'
+    to_email = ['gauryn@andrew.cmu.edu', request.user.email]
+    # text_msg = 'Attached is daily summary chart and journal entries.'
+    # html_msg = render(request, 'users/dailySummary.html', context)
+
+    hMsg = get_template('users/dailySummary.html').render(context)
+    eMsg = EmailMessage(subject, hMsg, to=to_email, from_email=from_email)
+    eMsg.content_subtype = 'html'
+    eMsg.send()
+
+    # Send Email
+    # send_mail( 
+    #     subject=subject,
+    #     message = text_msg,
+    #     from_email = from_email,
+    #     recipient_list = to_email,
+    #     fail_silently=False,
+    #     html_message = html_msg
+    # )
 
 def RemindersView(request):
     if request.user.is_authenticated() == False:

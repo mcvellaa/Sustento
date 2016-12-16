@@ -18,7 +18,7 @@
 <div class="container">
 	<!-- Explanation Alert -->
 	<div class="row alert alert-success" role="alert">
-		Note: Search by context for analysis by context or date for end of day summary.
+		Note: Search by context for analysis by context or date for end of day summary. Click on Email Button to send page to your therapist.
 	</div>
 	<!-- Filter Bar -->
 	<div class="row">
@@ -39,14 +39,17 @@
 
 	<div class="row"><p></p></div>
 
-	<!-- Title -->
+	<!-- Title + Email Button -->
 	<div class="row bg-faded">
+		<!-- Title -->
 		{% if contextForWeek is None %}
 			<span><h2 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> {{ currentDay }} </h2></span>
-			<span class="col-md-8 col-sm-8 col-xs-8 col-lg-8"><text>{{ currentDate }}</text></span>
+			<span class="col-md-4 col-sm-4 col-xs-4 col-lg-4"><text>{{ currentDate }}</text></span>
 		{% else %}
-			<h5 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> Context: {{ contextForWeek }} </h5>
+			<span><h5 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> Context: {{ contextForWeek }} </h5></span>
 		{% endif %}
+		<!-- EMail Button -->
+		<span><button id='emailSummaryBtn' type='submit' class='btn bg-info col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'> Email Report </button></span>
 	</div>
 
 	<div class="row"><p></p></div>
