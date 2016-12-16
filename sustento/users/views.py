@@ -342,6 +342,8 @@ def HomeView(request):
             return HttpResponseRedirect('/users/~home')
         elif email_form.is_valid():
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
+            print(request.user.name)
+            print(ContextForWeek.objects.all().last())
             searchContext = ContextForWeek.objects.filter(patient=request.user.id).latest('end_date')
             journalEntries = PersonalJournal.objects.all().filter(patient=request.user.id).filter(context__context__icontains=searchContext)
             journalEntriesByContextDict = getDictFromQuery(journalEntries)
