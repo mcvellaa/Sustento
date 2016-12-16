@@ -286,11 +286,21 @@ def HomeView(request):
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~home')
         elif email_form.is_valid():
-            print("Sending email")
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
-            
+            msg = EmailMultiAlternatives(
+                subject="Weekly Counselor Summary From: " + request.user.name,
+                body="Here is the weekly summary update for you.",
+                from_email="postmaster@sustentocmu.com",
+                to=[request.POST.get('email')],
+                reply_to=[request.user.email])
 
-            print(request.POST.get('email'))
+            html = """
+            
+            """
+            msg.attach_alternative(html, "text/html")
+
+            # Send it:
+            msg.send()
 
             return HttpResponseRedirect('/users/~home')
 
