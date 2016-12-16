@@ -20,7 +20,11 @@ import collections
 
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
-from anymail.message import attach_inline_image_file
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string, get_template
+
+
+from datetime import datetime
 
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
@@ -157,13 +161,37 @@ def getChartData(journalEntries):
         data["Disgust"].append(float(j.emotion_disgust))
     return data
 
-# Daily Dashboard for User
-def DailySummaryView(request):
-    from datetime import datetime
-    # 1. Get Search Date & Search Context: If User enters date
+def setChartContext(data):
+    # Set Chart Attributes
+    chartID = "lineChart"
+    chart = {"renderTo": chartID, "type": 'line'}  
+    # title = {"text": 'Daily Emotion Analysis'}
+    title = {"text": ''}
+    xAxis = {"title": {"text": 'Time'}, "categories": data['Time']}
+    yAxis = {"title": {"text": 'Emotion'}}
+    series = [
+        {"name": 'Anger', "data": data['Anger'], "color":'#d9534f'},
+        {"name": 'Sadness', "data": data['Sadness'], "color":'#5bc0de'},
+        {"name": 'Disgust', "data": data['Disgust'], "color":'#5cb85c'},
+        {"name": 'Joy', "data": data['Joy'], "color":'#ffd600'},
+        {"name": 'Fear', "data": data['Fear'], "color":'#EE82EE'}
+    ]
+
+    # Create Context Variables
+    context = {}
+    context['chartID'] = chartID
+    context['chart'] = chart
+    context['title'] = title
+    context['xAxis'] = xAxis
+    context['yAxis'] = yAxis
+    context['series'] = series
+
+    return context
+
+def getSearchDateFromFilterBar(request):
+    # 1. Get Search Date: If User enters date
     if request.method=='GET':
         stringDate = request.GET.get('searchStartDateBox', None)
-        searchContext = request.GET.get('searchContextBox', None)
     # Default: Search Date is now()
     if stringDate is None or stringDate=='':
         searchStartDate=datetime.now().date()
@@ -172,57 +200,85 @@ def DailySummaryView(request):
     else:
         # Get Date Object from String entered
         searchStartDate = datetime.strptime(stringDate, "%Y-%m-%d").date()
+    return searchStartDate
 
+def getSearchContextFromFilterBar(request):
+    searchContext = request.GET.get('searchContextBox', None)
+    return searchContext
+
+def getDictFromQuery(journalEntries):
+    journalEntriesByContextDict = dict()
+    for je in journalEntries:
+        if je.context in journalEntriesByContextDict:
+            journalEntriesByContextDict[je.context].append(je)
+        else:
+            journalEntriesByContextDict[je.context] = [je]
+    return journalEntriesByContextDict
+
+# DEAFULT View: Daily Dashboard for User
+def DailySummaryView(request):
+    from datetime import datetime
+    # 1. Get Search Date & Search Context: If User enters date
+    searchContext = getSearchContextFromFilterBar(request)
+    # If Context Specified: Render Chart Based on Context
+    if (searchContext != '' and searchContext!=None):
+        return ContextSummaryView(request)
+    # Else: Render Chart Based on Date
+    searchStartDate = getSearchDateFromFilterBar(request)
     # Get Current Day/ Date 
     currentDay = searchStartDate.strftime('%A').upper()
     currentDate = searchStartDate.strftime('%b %d, %y') 
-
-    # 2. Get journal entries for user for a given day
-    # Filter Bar: Require only date or require both context and date
-    if (searchContext != None and searchContext != '' and stringDate is not None):
-        journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate).filter(context__context__icontains=searchContext)
-    # if (searchContext != None and searchContext != ''):
-    #     journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
-    else:
-        journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)   
+    # 2. Get journal entries for user for a given day grouped by context
+    journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(date_created__contains=searchStartDate)
+    journalEntriesByContextDict = getDictFromQuery(journalEntries)
     context = {}
 
     # 3. Get Context & Data For Chart
     if len(journalEntries) < 1:
         con = None
     else:
-        con = journalEntries[0].context
+        # con = journalEntries[0].context
+        con = None
         data = getChartData(journalEntries)
+        # 4. Chart Attributes & Set Chart Context
+        context = setChartContext(data)
 
-        # 4. Chart Attributes
-        chartID = "lineChart"
-        chart = {"renderTo": chartID, "type": 'line'}  
-        # title = {"text": 'Daily Emotion Analysis'}
-        title = {"text": ''}
-        xAxis = {"title": {"text": 'Time'}, "categories": data['Time']}
-        yAxis = {"title": {"text": 'Emotion'}}
-        series = [
-            {"name": 'Anger', "data": data['Anger'], "color":'#d9534f'},
-            {"name": 'Sadness', "data": data['Sadness'], "color":'#5bc0de'},
-            {"name": 'Disgust', "data": data['Disgust'], "color":'#5cb85c'},
-            {"name": 'Joy', "data": data['Joy'], "color":'#ffd600'},
-            {"name": 'Fear', "data": data['Fear'], "color":'#EE82EE'}
-        ]
-
-        # 5. Create Context Variables
-        context['chartID'] = chartID
-        context['chart'] = chart
-        context['title'] = title
-        context['xAxis'] = xAxis
-        context['yAxis'] = yAxis
-        context['series'] = series
-
-    context['journalEntries'] = journalEntries
+    # Set Additional Chart Variables
+    context['journalEntries'] = journalEntriesByContextDict
+    context['journalEntriesExists'] = True if journalEntries.count()>1 else False
     context["contextForWeek"] = con
     context['currentDay'] = currentDay
     context['currentDate'] = currentDate
+
     # 6. Render Daily Summary Template
     return render(request, 'users/dailySummary.html', context)
+
+# Chart View if User specifies context
+def ContextSummaryView(request):
+    # 1. Get Reqd Context
+    searchContext = getSearchContextFromFilterBar(request)
+    # If None: set to current context for user
+    if (searchContext == None or searchContext == ''):
+        searchContext = ContextForWeek.objects.filter(patient=request.user).latest('end_date').context
+    # 2. Get Journal Entries for Context
+    journalEntries = PersonalJournal.objects.all().filter(patient=request.user).filter(context__context__icontains=searchContext)
+    journalEntriesByContextDict = getDictFromQuery(journalEntries)
+    # 3. Get Context & Data For Chart
+    context = {}
+    con = searchContext
+    if len(journalEntries) < 1:
+        con = None
+    else:
+        con = searchContext.title() # titlecase context
+        data = getChartData(journalEntries)
+        context = setChartContext(data)
+    # Set Additional Chart Variables
+    context['journalEntries'] = journalEntriesByContextDict
+    context['journalEntriesExists'] = True if journalEntries.count()>1 else False
+    context["contextForWeek"] = con
+    # 4. Render Context Summary
+    return render(request, 'users/dailySummary.html', context)    
+    
 
 def RemindersView(request):
     if request.user.is_authenticated() == False:
@@ -254,6 +310,12 @@ def HomeView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     elif request.user.is_authenticated() and request.user.phone == "":
+        remind1 = Reminders(patient=request.user.id, when=datetime.now(), text="What do you want to work on this week?")
+        remind1.save()
+        remind2 = Reminders(patient=request.user.id, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
+        remind2.save()
+        remind3 = Reminders(patient=request.user.id, when=(datetime.datetime.now() + datetime.timedelta(days=4)), text="How full is your hope tank? What do you want to better understand?")
+        remind3.save()
         return HttpResponseRedirect('/users/~update')
         
     from .forms import UserSendForm
@@ -280,11 +342,44 @@ def HomeView(request):
             # redirect to a new URL:
             return HttpResponseRedirect('/users/~home')
         elif email_form.is_valid():
+<<<<<<< HEAD
             print("Sending email")
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
             
 
             print(request.POST.get('email'))
+=======
+            #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
+            searchContext = ContextForWeek.objects.filter(patient=request.user.id).latest('end_date').context
+            journalEntries = PersonalJournal.objects.all().filter(patient=request.user.id).filter(context__context__icontains=searchContext)
+            journalEntriesByContextDict = getDictFromQuery(journalEntries)
+            # 3. Get Context & Data For Chart
+            context = {}
+            con = searchContext
+            if len(journalEntries) < 1:
+                con = None
+            else:
+                con = searchContext.title() # titlecase context
+                data = getChartData(journalEntries)
+                context = setChartContext(data)
+            # Set Additional Chart Variables
+            context['journalEntries'] = journalEntriesByContextDict
+            context['journalEntriesExists'] = True if journalEntries.count()>1 else False
+            context["contextForWeek"] = con
+            today = datetime.now().date().strftime("%Y-%m-%d")
+            patientName = request.user.name
+            msg = EmailMultiAlternatives(
+                subject=today + ": Weekly Counselor Summary From: " + patientName,
+                body="Here is the weekly summary update for you.",
+                from_email="postmaster@sustentocmu.com",
+                to=[request.POST.get('email')],
+                reply_to=[request.user.email])
+            hMsg = get_template('users/dailySummary.html').render(context)
+            msg.attach_alternative(hMsg, "text/html")
+
+            # Send it:
+            msg.send()
+>>>>>>> 12b6ae6446e66b287d5cff61d33070bf0577cfa2
 
             return HttpResponseRedirect('/users/~home')
 
@@ -365,9 +460,14 @@ def getResponseForMessage(msg, user):
 
 def makeEmergencyCall(user):
     tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+<<<<<<< HEAD
     phone_number = user.phone
     call = client.calls.create(to="+1" + phone_number,
                            from_="+12035601401", # will be campus police, but mark's phone number for now
+=======
+    call = client.calls.create(to="+12035601401",
+                           from_="+14122010448", # will be campus police, but mark's phone number for now
+>>>>>>> 12b6ae6446e66b287d5cff61d33070bf0577cfa2
                            url="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient")
 
 @csrf_exempt
@@ -468,6 +568,9 @@ def sendUserMessage(message, user):
 @csrf_exempt
 def UserSchedule(request):
     for r in Reminders.objects.all():
+        if ((datetime.datetime.now() - Response.objects.filter(sender=r.patient.id).last().date_created.replace(tzinfo=None)) > datetime.timedelta(6)):
+            #makeEmergencyCall(User.objects.get(id=r.patient))
+            sendUserMessage("You haven't responded in 6 days or more!", r.patient)
         if r.when.weekday() == datetime.datetime.today().weekday():
             sendUserMessage(r.text, r.patient)
     return HttpResponse('<?xml version="1.0" encoding="UTF-8"?><Response></Response>')

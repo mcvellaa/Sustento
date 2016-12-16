@@ -16,12 +16,16 @@
 
 {% block content %}
 <div class="container">
+	<!-- Explanation Alert -->
+	<div class="row alert alert-success" role="alert">
+		Note: Search by context for analysis by context or date for end of day summary. Click on Email Button on homepage to send summary to your therapist.
+	</div>
 	<!-- Filter Bar -->
 	<div class="row">
 		<form type='get' action='.' class='form-inline'>
 			<!-- Search Contexts -->
 			<div class='form-group col-md-4 col-sm-4 col-xs-4 col-lg-4'>
-				<input id='searchContextBox' type='text' name='searchContextBox' placeholder='Search Latest Context ...' class='form-control'>
+				<input id='searchContextBox' type='text' name='searchContextBox' placeholder='Search Context ...' class='form-control'>
 			</div>
 			<!-- Specific Date: within a given range for Context -->
 			<!-- Start Date -->
@@ -29,27 +33,31 @@
 				<input id='searchStartDateBox' type='date' name='searchStartDateBox' class='form-control'>
 			</div>
 			<!-- Submit -->
-			<button id='searchSubmitBox' type='submit' class='btn col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'> Search </button>
+			<button id='searchSubmitBox' type='submit' class='btn bg-info col-md-3 col-sm-3 col-xs-3 col-lg-3 offset-xs-1 offset-sm-1 offset-md-1 offset-lg-1'> Search </button>
 		</form>
 	</div>
 
 	<div class="row"><p></p></div>
 
-	<!-- Title -->
+	<!-- Title + Email Button -->
 	<div class="row bg-faded">
-		<span><h2 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> {{ currentDay }} </h2></span>
-		<span class="col-md-8 col-sm-8 col-xs-8 col-lg-8">
-			{% if contextForWeek is not None %}
-				<text>{{ currentDate }}</text>
-				<h6> {{ contextForWeek.context }} </h6>
-			{% endif %}
-		</span>
+		<!-- Title -->
+		{% if contextForWeek is None %}
+			<span><h2 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> {{ currentDay }} </h2></span>
+			<span class="col-md-4 col-sm-4 col-xs-4 col-lg-4"><text>{{ currentDate }}</text></span>
+		{% else %}
+			<span><h5 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> Context: {{ contextForWeek }} </h5></span>
+		{% endif %}
 	</div>
 
 	<div class="row"><p></p></div>
 
-	{% if contextForWeek is None %}
-	<div class="row"><p>No messages recorded on {{ currentDate }}</p></div>
+	{% if journalEntriesExists == False %}
+		{% if currentDate is None %}
+			<div class="row"><p>No messages found with context: {{ contextForWeek }}</p></div>
+		{% else %}
+			<div class="row"><p>No messages recorded on {{ currentDate }}</p></div>
+		{% endif %}
 	{% else %}
 	<!-- Chart -->
 	<div class="row">
@@ -60,50 +68,53 @@
 
 	<!-- Journal Entries + Emotion Analysis Results -->
 	<div class="row">
-		<div class='card'>
-			<!-- Heading: Context + Start/ End Dates -->
-			<div class='card-header'>
-				<div class='col-md-8 col-sm-8 col-xs-8 col-lg-8'>{{ contextForWeek.context }}</div>
-				<div class='col-md-4 col-sm-8 col-xs-8 col-lg-8 text-xs-right text-sm-right text-md-right text-lg-right'>{{ contextForWeek.start_date }} - {{ contextForWeek.end_date }}</div>
-			</div>
-			<!-- Body: Personal Journal Entries For Given Context -->
-			<div class='card-block'>
-				{% for j in journalEntries %}
-					<!-- Background Color of Journal Entry Based on Dominant Mood -->
-					{% with dm=j.get_dominant_mood %}
-						{% if dm == "Anger" %}
-							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-danger'> 
-								{{j.print_time}} <br>
-								{{j.entry}} 
-							</p>
-						{% elif dm == "Disgust" %}
-							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-success'> 
-								{{j.print_time}} <br>
-								{{j.entry}} 
-							</p>
-						{% elif dm == "Sadness" %}
-							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-info'> 
-								{{j.print_time}} <br>
-								{{j.entry}} 
-							</p>
-						{% elif dm == "Fear" %}
-							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-fear'> 
-								{{j.print_time}} <br>
-								{{j.entry}} 
-							</p>
-						{% else %}
-							<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-joy'> 
-								{{j.print_time}} <br>
-								{{j.entry}} 
-							</p>
-						{% endif %}
-					{% endwith %}
-				{% endfor %}
-			</div>
-			<!-- Footer: End of Week -->
-			<div class='card-footer'>
-			</div>
-		</div> <!-- End of Card Div -->
+		{% for k,je in journalEntries.items %}
+			<div class='card'>
+				<!-- Heading: Context + Start/ End Dates -->
+				<div class='card-header'>
+					<div class='col-md-8 col-sm-8 col-xs-8 col-lg-8'>{{ k.context }}</div>
+					<div class='col-md-4 col-sm-8 col-xs-8 col-lg-8 text-xs-right text-sm-right text-md-right text-lg-right'>{{ k.start_date }} - {{ k.end_date }}</div>
+				</div>
+				<!-- Body: Personal Journal Entries For Given Context -->
+					<div class='card-block'>
+						{% for j in je %}
+							<!-- Background Color of Journal Entry Based on Dominant Mood -->
+							{% with dm=j.get_dominant_mood %}
+								{% if dm == "Anger" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-danger'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% elif dm == "Disgust" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-success'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% elif dm == "Sadness" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-info'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% elif dm == "Fear" %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-fear'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% else %}
+									<p class='col-md-12 col-lg-12 col-xs-12 col-sm-12 bg-joy'> 
+										{{j.print_time}} <br>
+										{{j.entry}} 
+									</p>
+								{% endif %}
+							{% endwith %}
+							<br>
+						{% endfor %}
+					</div> <!-- End of Card Block -->
+				<!-- Footer: End of Week -->
+				<div class='card-footer'>
+				</div>
+			</div> <!-- End of Card Div -->
+		{% endfor %}
 	</div> <!-- End of Row Div -->
 	{% endif %}
 
@@ -137,4 +148,5 @@
 		    });
 		});
 	</script>
+
 {% endblock %}

@@ -95,7 +95,6 @@ class PersonalJournal(models.Model):
             dominant_emotion = 'Fear'
         else:
             dominant_emotion = 'Joy'
-        print('Emotion: ', dominant_emotion)
         return dominant_emotion
 
 class HighRiskLog(models.Model):
