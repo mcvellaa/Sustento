@@ -247,9 +247,6 @@ def DailySummaryView(request):
     context['currentDay'] = currentDay
     context['currentDate'] = currentDate
 
-    # Send Email
-    EmailSummaryView(request, context)
-
     # 6. Render Daily Summary Template
     return render(request, 'users/dailySummary.html', context)
 

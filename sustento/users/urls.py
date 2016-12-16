@@ -65,5 +65,10 @@ urlpatterns = [
         regex=r'^~dailySummary/$',
         view=views.DailySummaryView,
         name='dailySummary'
+    ),
+        url(
+        regex=r'^~emailSummary/$',
+        view=views.EmailSummaryView,
+        name='emailSummary'
     )
 ]
