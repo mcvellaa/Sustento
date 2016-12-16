@@ -550,7 +550,7 @@ def sendUserMessage(message, user):
 @csrf_exempt
 def UserSchedule(request):
     for r in Reminders.objects.all():
-        if ((datetime.datetime.now() - Response.objects.filter(sender=r.patient.id).last().date_created.replace(tzinfo=None)) > datetime.timedelta(6)):
+        if ((Response.objects.filter(sender=r.patient.id).count()) < 0 and ((datetime.datetime.now() - Response.objects.filter(sender=r.patient.id).last().date_created.replace(tzinfo=None)) > datetime.timedelta(6))):
             #makeEmergencyCall(User.objects.get(id=r.patient))
             sendUserMessage("You haven't responded in 6 days or more!", r.patient)
         if r.when.weekday() == datetime.datetime.today().weekday():
