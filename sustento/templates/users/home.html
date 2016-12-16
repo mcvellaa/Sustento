@@ -1,4 +1,4 @@
-<body class="mainpage">
+<body class="home">
 
 {% extends "base.html" %}
 {% load static %}
@@ -20,7 +20,7 @@
     </div>
     <br>
     <div class="row">
-      <div class="col-sm-8">
+      <div class="col-sm-7">
         <h3>Username: {{ request.user.username }}</h3>
         {% if request.user.name %}
           <p>Full name: {{ request.user.name }}</p>
@@ -33,7 +33,7 @@
         <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Update My Name and Phone</a>
         <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">Update My E-Mail</a>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-5">
         <h3>Send Reminder Text Message</h3>
         <p>If you forget the phone number for this service or want to make sure you can receive text messages, enter a test message below and click "Send"</p>
         <form class="form-horizontal" method="post" action="{% url 'users:home' %}">
@@ -48,6 +48,8 @@
       </div>
       <br>
     </div>
+
+    <br><br><br><br>
     <div class="row">
       <div class="col-sm-12">
         <h3>Send Weekly Summary to Counselor</h3>
@@ -74,4 +76,4 @@
 </div>
 {% endblock content %}
 
-<body class="mainpage">
+</body>

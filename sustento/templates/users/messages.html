@@ -9,7 +9,7 @@
 {% if mes %}
     {% for key, value in mes.items %}
         {% if value.type == "sent" %}
-            <div class="row">
+            <div class="row msg1">
                 <div class="col-sm-6" style="background-color: lightgray">
                     <p>{{ value.date }}: {{ value.text }}</p>
                 </div>

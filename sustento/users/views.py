@@ -25,6 +25,7 @@ from django.template.loader import render_to_string, get_template
 
 
 from datetime import datetime
+
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -451,8 +452,14 @@ def getResponseForMessage(msg, user):
 
 def makeEmergencyCall(user):
     tclient = TwilioRestClient(os.environ['TWILIO_ACCOUNT_SID'], os.environ['TWILIO_API_AUTH'])
+<<<<<<< HEAD
+    phone_number = user.phone
+    call = client.calls.create(to="+1" + phone_number,
+                           from_="+12035601401", # will be campus police, but mark's phone number for now
+=======
     call = client.calls.create(to="+12035601401",
                            from_="+14122010448", # will be campus police, but mark's phone number for now
+>>>>>>> 12b6ae6446e66b287d5cff61d33070bf0577cfa2
                            url="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient")
 
 @csrf_exempt
