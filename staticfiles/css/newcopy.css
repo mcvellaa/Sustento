@@ -48,12 +48,17 @@ font-family: Zapfino;
   border: 3px #FF7E79;
   opacity: 0.6;
   filter: alpha(opacity=60); /* For IE8 and earlier */
-  color: red;
+  color: red !important;
   font-family: Heiti SC;
 }
 
-.msg1 {
-  border: 2px #000000;
+.msg {
+  border:1px solid lightgray !important;
+  font-family: Heiti SC;
+}
+
+.msg2 {
+  border:1px solid lightblue !important;
   font-family: Heiti SC;
 }
 
