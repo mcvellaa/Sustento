@@ -90,7 +90,7 @@ def MainView(request):
     if request.user.is_authenticated() and request.user.phone == "":
         remind1 = Reminders(patient=request.user, when=datetime.datetime.now(), text="What do you want to work on this week?")
         remind1.save()
-        remind2 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
+        remind2 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now?")
         remind2.save()
         remind3 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=4)), text="How full is your hope tank? What do you want to better understand?")
         remind3.save()
@@ -308,7 +308,7 @@ def HomeView(request):
     elif request.user.is_authenticated() and request.user.phone == "":
         remind1 = Reminders(patient=request.user, when=datetime.datetime.now(), text="What do you want to work on this week?")
         remind1.save()
-        remind2 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
+        remind2 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now?")
         remind2.save()
         remind3 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=4)), text="How full is your hope tank? What do you want to better understand?")
         remind3.save()
