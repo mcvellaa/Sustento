@@ -23,9 +23,6 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string, get_template
 
-
-from datetime import datetime
-
 #------------------------------------------------------
 # For Alchemy and Conversation APIs to work:
 import json
@@ -91,7 +88,7 @@ def MessagesView(request):
 
 def MainView(request):
     if request.user.is_authenticated() and request.user.phone == "":
-        remind1 = Reminders(patient=request.user, when=datetime.now(), text="What do you want to work on this week?")
+        remind1 = Reminders(patient=request.user, when=datetime.datetime.now(), text="What do you want to work on this week?")
         remind1.save()
         remind2 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
         remind2.save()
@@ -194,7 +191,7 @@ def getSearchDateFromFilterBar(request):
         stringDate = request.GET.get('searchStartDateBox', None)
     # Default: Search Date is now()
     if stringDate is None or stringDate=='':
-        searchStartDate=datetime.now().date()
+        searchStartDate=datetime.datetime.now().date()
         # FOR LOCAL TESTING: Search Date is set to 30th Nov
         # searchStartDate = datetime.strptime('20161130', "%Y%m%d").date()
     else:
@@ -217,7 +214,6 @@ def getDictFromQuery(journalEntries):
 
 # DEAFULT View: Daily Dashboard for User
 def DailySummaryView(request):
-    from datetime import datetime
     # 1. Get Search Date & Search Context: If User enters date
     searchContext = getSearchContextFromFilterBar(request)
     # If Context Specified: Render Chart Based on Context
@@ -310,7 +306,7 @@ def HomeView(request):
     if request.user.is_authenticated() == False:
         return HttpResponseRedirect('/accounts/login/')
     elif request.user.is_authenticated() and request.user.phone == "":
-        remind1 = Reminders(patient=request.user, when=datetime.now(), text="What do you want to work on this week?")
+        remind1 = Reminders(patient=request.user, when=datetime.datetime.now(), text="What do you want to work on this week?")
         remind1.save()
         remind2 = Reminders(patient=request.user, when=(datetime.datetime.now() + datetime.timedelta(days=2)), text="What are you feeling right now? How does your body feel right now? (Our feelings are actually felt by our body - e.g. shoulders tight, tense chest because of a difficult situation)")
         remind2.save()
@@ -359,7 +355,7 @@ def HomeView(request):
             context['journalEntries'] = journalEntriesByContextDict
             context['journalEntriesExists'] = True if journalEntries.count()>1 else False
             context["contextForWeek"] = con
-            today = datetime.now().date().strftime("%Y-%m-%d")
+            today = datetime.datetime.now().date().strftime("%Y-%m-%d")
             patientName = request.user.name
             msg = EmailMultiAlternatives(
                 subject=today + ": Weekly Counselor Summary From: " + patientName,
