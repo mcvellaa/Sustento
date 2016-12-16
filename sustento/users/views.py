@@ -343,7 +343,6 @@ def HomeView(request):
         elif email_form.is_valid():
             #THIS IS WHERE YOU GENERATE THE MESSAGE AND SEND IT
             searchContext = ContextForWeek.objects.filter(patient=request.user.id).latest('end_date').context
-            print(searchContext)
             journalEntries = PersonalJournal.objects.all().filter(patient=request.user.id).filter(context__context__icontains=searchContext)
             journalEntriesByContextDict = getDictFromQuery(journalEntries)
             # 3. Get Context & Data For Chart
@@ -359,8 +358,6 @@ def HomeView(request):
             context['journalEntries'] = journalEntriesByContextDict
             context['journalEntriesExists'] = True if journalEntries.count()>1 else False
             context["contextForWeek"] = con
-            print(journalEntriesByContextDict)
-            print(journalEntries.count())
             today = datetime.now().date().strftime("%Y-%m-%d")
             patientName = request.user.name
             msg = EmailMultiAlternatives(
