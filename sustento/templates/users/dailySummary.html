@@ -17,7 +17,7 @@
 {% block content %}
 <div class="container">
 	<!-- Explanation Alert -->
-	<div class="row alert alert-success" role="alert">
+	<div class="row alert alert-success jumbotron" role="alert">
 		Note: Search by context for analysis by context or date for end of day summary. Click on Email Button on homepage to send summary to your therapist.
 	</div>
 	<!-- Filter Bar -->
@@ -40,7 +40,7 @@
 	<div class="row"><p></p></div>
 
 	<!-- Title + Email Button -->
-	<div class="row bg-faded">
+	<div class="row">
 		<!-- Title -->
 		{% if contextForWeek is None %}
 			<span><h2 class="col-md-4 col-sm-4 col-xs-4 col-lg-4"> {{ currentDay }} </h2></span>
